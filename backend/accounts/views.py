@@ -45,10 +45,12 @@ class LoginView(APIView):
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]   # ✅ THIS IS THE FIX
+    permission_classes = [AllowAny]  # ✅ PUBLIC API
 
     def post(self, request):
         email = request.data.get("email")
@@ -67,7 +69,7 @@ class ForgotPasswordView(APIView):
                 status=404
             )
 
-        # 🔐 Later we will add email sending here
+        # ✅ TEMP RESPONSE (email sending comes later)
         return Response(
             {"message": "Password reset link sent"},
             status=200
