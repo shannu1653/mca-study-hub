@@ -50,11 +50,63 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from .models import PasswordResetToken
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 User = get_user_model()
 
 
 class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+
+        if not email:
+            return Response({"error": "Email is required"}, status=400)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "Email not found"}, status=404)
+
+        # delete old tokens
+        PasswordResetToken.objects.filter(user=user).delete()
+
+        # create token
+        reset_token = PasswordResetToken.objects.create(user=user)
+
+        # reset link
+        reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset_token.token}"
+
+        # ===== SEND EMAIL =====
+        subject = "Reset your MCA Study password"
+        message = f"""
+Hello {user.email},
+
+You requested a password reset.
+
+Click the link below to reset your password:
+{reset_link}
+
+If you did not request this, please ignore this email.
+
+Thanks,
+MCA Study Team
+"""
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response({
+            "message": "Password reset link sent to email"
+        }, status=200)
+
     permission_classes = [AllowAny]
 
     def post(self, request):
