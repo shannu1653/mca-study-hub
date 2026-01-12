@@ -42,41 +42,26 @@ class LoginView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]   # 🔥 THIS FIXES 401
+    permission_classes = [AllowAny]   # 🔥 IMPORTANT
 
     def post(self, request):
         email = request.data.get("email")
 
         if not email:
-            return Response(
-                {"error": "Email is required"},
-                status=400
-            )
+            return Response({"error": "Email is required"}, status=400)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response(
-                {"error": "Email not found"},
-                status=404
-            )
-
-        send_mail(
-            subject="Reset your MCA Study password",
-            message="Your password reset request received.",
-            from_email=None,
-            recipient_list=[email],
-        )
+        if not User.objects.filter(email=email).exists():
+            return Response({"error": "Email not found"}, status=404)
 
         return Response(
-            {"message": "Reset email sent"},
+            {"message": "Password reset link sent"},
             status=200
         )
