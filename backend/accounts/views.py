@@ -41,3 +41,39 @@ class LoginView(APIView):
             })
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import uuid
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Email not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        token = str(uuid.uuid4())
+
+        user.profile.reset_token = token
+        user.profile.save()
+
+        reset_link = f"https://your-frontend-url/reset-password/{token}"
+
+        send_mail(
+            "Reset your password",
+            f"Click the link to reset your password:\n{reset_link}",
+            None,
+            [email],
+        )
+
+        return Response({"message": "Reset link sent"})
