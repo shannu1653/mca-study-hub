@@ -46,31 +46,59 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
+from django.conf import settings
+
+from .models import PasswordResetToken
 
 User = get_user_model()
 
 class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]  # ✅ PUBLIC API
+    permission_classes = [AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
 
         if not email:
-            return Response(
-                {"error": "Email is required"},
-                status=400
-            )
+            return Response({"error": "Email required"}, status=400)
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response(
-                {"error": "Email not found"},
-                status=404
-            )
+            return Response({"error": "Email not found"}, status=404)
 
-        # ✅ TEMP RESPONSE (email sending comes later)
-        return Response(
-            {"message": "Password reset link sent"},
-            status=200
-        )
+        # ✅ Delete old tokens
+        PasswordResetToken.objects.filter(user=user).delete()
+
+        # ✅ Create new token
+        reset_token = PasswordResetToken.objects.create(user=user)
+
+        # ✅ FRONTEND RESET LINK
+        reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset_token.token}"
+
+        # (For now we return link — email comes next)
+        return Response({
+            "message": "Reset link generated",
+            "reset_link": reset_link
+        })
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, token):
+        password = request.data.get("password")
+
+        if not password:
+            return Response({"error": "Password required"}, status=400)
+
+        try:
+            reset_obj = PasswordResetToken.objects.get(token=token)
+        except PasswordResetToken.DoesNotExist:
+            return Response({"error": "Invalid or expired token"}, status=400)
+
+        user = reset_obj.user
+        user.set_password(password)
+        user.save()
+
+        reset_obj.delete()
+
+        return Response({"message": "Password reset successful"})
