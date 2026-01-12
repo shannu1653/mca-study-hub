@@ -8,6 +8,6 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path("forgot-password/", ForgotPasswordView.as_view()),
-    path("reset-password/<uuid:token>/", ResetPasswordView.as_view()),
+    path("forgot-password/", ForgotPasswordView.as_view(),name="forgot-password"),
+    path("reset-password/<uuid:token>/", ResetPasswordView.as_view(),name="reset-password"),
 ]

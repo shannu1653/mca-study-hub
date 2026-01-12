@@ -159,6 +159,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+FRONTEND_URL = "https://mca-study-hub.onrender.com"
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
