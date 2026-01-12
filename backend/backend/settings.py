@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-!n53e(ws6_#c&&3($y1xq5d*rg4d%b5o99kxs+t0j4xpj(apz-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["mca-study-hub.onrender.com",
+    "localhost",
+    "127.0.0.1",]
 
 
 # Application definition
