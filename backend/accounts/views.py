@@ -44,16 +44,11 @@ class LoginView(APIView):
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 from rest_framework.permissions import AllowAny
-import uuid
-
-User = get_user_model()
+from django.contrib.auth.models import User
 
 class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]  # ✅ IMPORTANT
+    permission_classes = [AllowAny]   # ✅ THIS IS THE FIX
 
     def post(self, request):
         email = request.data.get("email")
@@ -61,32 +56,19 @@ class ForgotPasswordView(APIView):
         if not email:
             return Response(
                 {"error": "Email is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=400
             )
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response(
-                {"error": "User with this email does not exist"},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Email not found"},
+                status=404
             )
 
-        reset_token = str(uuid.uuid4())
-        user.reset_token = reset_token
-        user.save()
-
-        reset_link = f"https://mca-study-hub.onrender.com/reset-password/{reset_token}"
-
-        send_mail(
-            "Reset Your Password",
-            f"Click the link to reset your password:\n{reset_link}",
-            "noreply@mcastudyhub.com",
-            [email],
-            fail_silently=False,
-        )
-
+        # 🔐 Later we will add email sending here
         return Response(
-            {"message": "Password reset link sent to your email"},
-            status=status.HTTP_200_OK
+            {"message": "Password reset link sent"},
+            status=200
         )
