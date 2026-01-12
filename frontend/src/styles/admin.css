@@ -1,0 +1,28 @@
+.admin-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 420px;
+}
+
+.admin-form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.admin-form-row input {
+  flex: 1;
+  padding: 8px;
+}
+
+.admin-list-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+button.danger {
+  background: #ef4444;
+  color: white;
+}

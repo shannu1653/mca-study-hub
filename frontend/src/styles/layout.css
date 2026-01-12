@@ -1,0 +1,306 @@
+/* ================= ROOT THEME ================= */
+
+/* ===== MOBILE RESET ===== */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+
+
+
+:root {
+  --bg: #f5f7fb;
+  --text: #222;
+  --card: #ffffff;
+  --accent: #2563eb;
+}
+
+body.dark {
+  --bg: #0f172a;
+  --text: #e5e7eb;
+  --card: #1e293b;
+  --accent: #38bdf8;
+}
+
+/* ================= LAYOUT ================= */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 220px;
+  background: var(--card);
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 10px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.sidebar nav a:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ================= MAIN ================= */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+/* ================= TOP BAR ================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.topbar input {
+  padding: 8px 12px;
+  width: 220px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ================= TOP ACTIONS ================= */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= SAVED NOTES PILL ================= */
+.saved-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef2ff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.saved-pill span {
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ================= DARK MODE BUTTON ================= */
+.top-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.top-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* ================= LOGOUT ================= */
+.logout-wrapper {
+  position: relative;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+  min-width: 96px;      /* 🔥 prevents jumping */
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+/* ================= 🌟 NEW BADGE ================= */
+.new-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff3b30;
+  color: white;
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  animation: glowPulse 1.6s infinite;
+  pointer-events: none;
+}
+
+/* ================= GLOW ANIMATION ================= */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 59, 48, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 59, 48, 0.9);
+    transform: scale(1.1);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 59, 48, 0.6);
+    transform: scale(1);
+  }
+}
+
+
+/* ===== MOBILE VIEW ===== */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+  }
+
+  .sidebar h2 {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .sidebar nav {
+    display: flex;
+    gap: 12px;
+  }
+
+  .sidebar nav a {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .topbar input {
+    width: 100%;
+  }
+
+  .top-actions {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+@media (max-width: 768px) {
+  button {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .sidebar nav {
+    gap: 6px;
+  }
+
+  .sidebar nav a {
+    font-size: 13px;
+  }
+
+  .saved-pill {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+}
+/* ===== VISIBILITY HELPERS ===== */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* ===== MOBILE BOTTOM NAV ===== */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--card);
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 18px;
+    background: none;
+    border: none;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .bottom-nav span {
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .bottom-nav .active {
+    color: var(--accent);
+  }
+
+  /* prevent content hidden behind nav */
+  .main {
+    padding-bottom: 80px;
+  }
+}

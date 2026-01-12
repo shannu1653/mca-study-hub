@@ -1,0 +1,147 @@
+/* ===== LOGIN PAGE ===== */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* ===== LOGIN CARD ===== */
+.login-card {
+  background: var(--card, #fff);
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.6s ease;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+/* ===== INPUT FLOATING LABEL ===== */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5f5;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+}
+
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 13px;
+  pointer-events: none;
+  transition: 0.3s ease;
+  background: white;
+  padding: 0 6px;
+}
+
+.input-group input:focus,
+.input-group input:valid {
+  border-color: #2563eb;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label {
+  top: -6px;
+  font-size: 11px;
+  color: #2563eb;
+}
+
+/* ===== BUTTON ===== */
+.login-card button {
+  width: 100%;
+  padding: 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(37,99,235,0.4);
+}
+
+.login-card button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===== DARK MODE ===== */
+body.dark .login-page {
+  background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+body.dark .login-card {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+body.dark .input-group label {
+  background: #020617;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 22px;
+    border-radius: 14px;
+  }
+}
+/* ===== AUTH LINKS ===== */
+.auth-link {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.auth-link span {
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-link span:hover {
+  text-decoration: underline;
+}
