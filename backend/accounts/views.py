@@ -47,19 +47,26 @@ from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 
 class ForgotPasswordView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]   # 🔥 THIS FIXES 401
 
     def post(self, request):
         email = request.data.get("email")
+
+        if not email:
+            return Response(
+                {"error": "Email is required"},
+                status=400
+            )
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response(
                 {"error": "Email not found"},
-                status=status.HTTP_404_NOT_FOUND
+                status=404
             )
 
         send_mail(
@@ -71,5 +78,5 @@ class ForgotPasswordView(APIView):
 
         return Response(
             {"message": "Reset email sent"},
-            status=status.HTTP_200_OK
+            status=200
         )
