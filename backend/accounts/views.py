@@ -42,15 +42,15 @@ class LoginView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import uuid
 
 class ForgotPasswordView(APIView):
+    permission_classes = []
+
     def post(self, request):
         email = request.data.get("email")
 
@@ -62,18 +62,14 @@ class ForgotPasswordView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        token = str(uuid.uuid4())
-
-        user.profile.reset_token = token
-        user.profile.save()
-
-        reset_link = f"https://your-frontend-url/reset-password/{token}"
-
         send_mail(
-            "Reset your password",
-            f"Click the link to reset your password:\n{reset_link}",
-            None,
-            [email],
+            subject="Reset your MCA Study password",
+            message="Your password reset request received.",
+            from_email=None,
+            recipient_list=[email],
         )
 
-        return Response({"message": "Reset link sent"})
+        return Response(
+            {"message": "Reset email sent"},
+            status=status.HTTP_200_OK
+        )
