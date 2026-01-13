@@ -46,17 +46,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.mail import send_mail
 
 from .models import PasswordResetToken
-from django.core.mail import send_mail
-from django.conf import settings
-
 
 User = get_user_model()
 
 
+# =========================
+# FORGOT PASSWORD (SEND LINK)
+# =========================
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
 
@@ -64,25 +66,33 @@ class ForgotPasswordView(APIView):
         email = request.data.get("email")
 
         if not email:
-            return Response({"error": "Email is required"}, status=400)
+            return Response(
+                {"error": "Email is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "Email not found"}, status=404)
+            # Security: don't reveal user existence
+            return Response(
+                {"message": "If email exists, reset link sent"},
+                status=status.HTTP_200_OK
+            )
 
-        # delete old tokens
+        # Delete old tokens
         PasswordResetToken.objects.filter(user=user).delete()
 
-        # create token
+        # Create new token
         reset_token = PasswordResetToken.objects.create(user=user)
 
-        # reset link
-        reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset_token.token}"
+        frontend_url = settings.FRONTEND_URL.rstrip("/")
+        reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
 
-        # ===== SEND EMAIL =====
-        subject = "Reset your MCA Study password"
-        message = f"""
+        # Send email (PLAIN TEXT)
+        send_mail(
+            subject="Reset your MCA Study password",
+            message=f"""
 Hello {user.email},
 
 You requested a password reset.
@@ -90,78 +100,36 @@ You requested a password reset.
 Click the link below to reset your password:
 {reset_link}
 
-If you did not request this, please ignore this email.
+If you did not request this, ignore this email.
 
-Thanks,
-MCA Study Team
-"""
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
+– MCA Study Team
+""",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
             fail_silently=False,
         )
 
-        return Response({
-            "message": "Password reset link sent to email"
-        }, status=200)
-
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        email = request.data.get("email")
-
-        # ✅ 1. Validate email
-        if not email:
-            return Response(
-                {"error": "Email is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # ✅ 2. Find user safely
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response(
-                {"error": "Email not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # ✅ 3. Delete old tokens
-        PasswordResetToken.objects.filter(user=user).delete()
-
-        # ✅ 4. Create new reset token
-        reset_token = PasswordResetToken.objects.create(user=user)
-
-        # ✅ 5. Build frontend reset link
-        frontend_url = getattr(settings, "FRONTEND_URL", "").rstrip("/")
-        reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
-
-        # ⚠️ For now return link (email sending comes next)
         return Response(
-            {
-                "message": "Password reset link generated",
-                "reset_link": reset_link
-            },
+            {"message": "Password reset link sent"},
             status=status.HTTP_200_OK
         )
 
 
+# =========================
+# RESET PASSWORD (FROM REACT)
+# =========================
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, token):
         password = request.data.get("password")
 
-        # ✅ 1. Validate password
         if not password:
             return Response(
                 {"error": "Password is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ✅ 2. Validate token
         try:
             reset_obj = PasswordResetToken.objects.get(token=token)
         except PasswordResetToken.DoesNotExist:
@@ -170,12 +138,11 @@ class ResetPasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ✅ 3. Reset password
         user = reset_obj.user
         user.set_password(password)
         user.save()
 
-        # ✅ 4. Delete token after use
+        # One-time use token
         reset_obj.delete()
 
         return Response(
