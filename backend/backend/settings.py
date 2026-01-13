@@ -148,11 +148,12 @@ DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
-# ======================
-# CORS (FOR REACT)
-# ======================
-CORS_ALLOW_ALL_ORIGINS = True  # ✅ OK for now
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
+]
 
+CORS_ALLOW_CREDENTIALS = True
 
 # ======================
 # INTERNATIONALIZATION
@@ -172,6 +173,4 @@ STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+
