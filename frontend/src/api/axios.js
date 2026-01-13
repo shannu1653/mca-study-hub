@@ -5,28 +5,15 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // ✅ VERY IMPORTANT
 });
 
-/*
-  ✅ Attach token ONLY for protected routes
-  ❌ NEVER attach token for login/register/forgot/reset
-*/
+// ✅ Attach Token ONLY if exists
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access");
+    const token = localStorage.getItem("token");
 
-    const publicRoutes = [
-      "auth/login/",
-      "auth/register/",
-      "auth/forgot-password/",
-      "auth/reset-password/",
-    ];
-
-    const isPublic = publicRoutes.some((route) =>
-      config.url.includes(route)
-    );
-
-    if (!isPublic && token) {
+    if (token) {
       config.headers.Authorization = `Token ${token}`;
     }
 

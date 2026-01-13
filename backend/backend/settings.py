@@ -1,5 +1,5 @@
 """
-Django settings for backend project
+Django settings for backend project.
 """
 
 from pathlib import Path
@@ -14,13 +14,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 # SECURITY
 # ======================
-SECRET_KEY = "django-insecure-change-this-later"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-dev-key"
+)
+
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "mca-study-hub.onrender.com",
     "localhost",
     "127.0.0.1",
+    "mca-study-hub.onrender.com",
 ]
 
 
@@ -37,11 +41,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Third-party
     "rest_framework",
     "rest_framework.authtoken",
 
-    # Local apps
     "accounts",
     "notes",
 ]
@@ -51,14 +53,11 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ======================
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # ✅ MUST BE FIRST
+    "corsheaders.middleware.CorsMiddleware",  # MUST BE FIRST
     "django.middleware.security.SecurityMiddleware",
-    "django.middleware.common.CommonMiddleware",
-
-    # ❌ CSRF REMOVED (API + TokenAuth)
-    # "django.middleware.csrf.CsrfViewMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -144,17 +143,50 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-DEFAULT_FROM_EMAIL = "MCA Study <no-reply@mcastudy.com>"
-FRONTEND_URL = os.getenv("FRONTEND_URL")
+DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 # ======================
-# 🔥 FINAL CORS FIX (IMPORTANT)
+# ✅ CORS (THIS FIXES EVERYTHING)
 # ======================
-# Allow ALL origins (needed for Vercel preview URLs)
+CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://mca-study-hub.vercel.app",
+    "https://mca-study-2sofygebe-shanmukhas-projects-7e30e8f5.vercel.app",
+]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://mca-study-hub.vercel.app",
+    "https://mca-study-2sofygebe-shanmukhas-projects-7e30e8f5.vercel.app",
+]
 
 
 # ======================
