@@ -123,7 +123,7 @@ AUTH_USER_MODEL = "accounts.User"
 # REST FRAMEWORK
 # ======================
 REST_FRAMEWORK = {
-    # 🔐 Default = secure
+    # 🔐 Secure by default
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
@@ -165,7 +165,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://mca-study-hub.vercel.app",
 ]
 
-CORS_ALLOW_CREDENTIALS = False  # ❌ Not using cookies
+CORS_ALLOW_CREDENTIALS = False  # ❌ No cookies (Token auth)
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -174,6 +174,10 @@ CORS_ALLOW_HEADERS = [
     "origin",
     "user-agent",
     "x-requested-with",
+]
+
+CORS_EXPOSE_HEADERS = [
+    "Authorization",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -200,6 +204,14 @@ USE_TZ = True
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+
+# ======================
+# HTTPS FIX FOR RENDER
+# ======================
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # ======================
