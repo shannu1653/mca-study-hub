@@ -113,10 +113,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-from dotenv import load_dotenv
+
 import os
 
-load_dotenv()
+
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
