@@ -5,15 +5,15 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // ✅ VERY IMPORTANT
+  // ❌ DO NOT use withCredentials for token auth
 });
 
-// ✅ Attach Token ONLY if exists
+// ✅ Attach DRF Token correctly
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access"); // ✅ CORRECT KEY
 
-    if (token) {
+    if (token && token !== "undefined" && token !== "null") {
       config.headers.Authorization = `Token ${token}`;
     }
 

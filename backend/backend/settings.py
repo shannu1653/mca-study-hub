@@ -14,12 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 # SECURITY
 # ======================
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-dev-key"
-)
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
-DEBUG = True
+# ❌ DEBUG must be False on Render
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -57,7 +55,10 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+
+    # ❌ CSRF not required for Token Auth APIs
+    # "django.middleware.csrf.CsrfViewMiddleware",
+
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -122,8 +123,9 @@ AUTH_USER_MODEL = "accounts.User"
 # REST FRAMEWORK
 # ======================
 REST_FRAMEWORK = {
+    # 🔐 Default = secure
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -145,11 +147,15 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+# ✅ Used for reset password link
+FRONTEND_URL = os.getenv(
+    "FRONTEND_URL",
+    "https://mca-study-hub.vercel.app"
+)
 
 
 # ======================
-# ✅ CORS (THIS FIXES EVERYTHING)
+# CORS (RENDER + VERCEL SAFE)
 # ======================
 CORS_ALLOW_ALL_ORIGINS = False
 
@@ -157,10 +163,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://mca-study-hub.vercel.app",
-    "https://mca-study-2sofygebe-shanmukhas-projects-7e30e8f5.vercel.app",
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = False  # ❌ Not using cookies
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -168,7 +173,6 @@ CORS_ALLOW_HEADERS = [
     "content-type",
     "origin",
     "user-agent",
-    "x-csrftoken",
     "x-requested-with",
 ]
 
@@ -179,13 +183,6 @@ CORS_ALLOW_METHODS = [
     "PATCH",
     "POST",
     "PUT",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://mca-study-hub.vercel.app",
-    "https://mca-study-2sofygebe-shanmukhas-projects-7e30e8f5.vercel.app",
 ]
 
 
@@ -199,7 +196,13 @@ USE_TZ = True
 
 
 # ======================
-# STATIC FILES
+# STATIC FILES (RENDER)
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# ======================
+# DEFAULT AUTO FIELD
+# ======================
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
