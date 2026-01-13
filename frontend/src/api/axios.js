@@ -7,10 +7,9 @@ const api = axios.create({
   },
 });
 
-// ✅ Attach Token correctly
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access"); // ✅ CORRECT KEY
+    const token = localStorage.getItem("access"); // ✅ FIXED
 
     if (token) {
       config.headers.Authorization = `Token ${token}`;

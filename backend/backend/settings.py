@@ -122,8 +122,8 @@ AUTH_USER_MODEL = "accounts.User"
 # ======================
 # REST FRAMEWORK
 # ======================
+# settings.py
 REST_FRAMEWORK = {
-    # 🔐 Secure by default
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
@@ -131,6 +131,8 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
 }
+
+
 
 
 # ======================
@@ -157,7 +159,17 @@ FRONTEND_URL = os.getenv(
 # ======================
 # CORS (RENDER + VERCEL SAFE)
 # ======================
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+
+    # ✅ MAIN VERCEL
+    "https://mca-study-hub.vercel.app",
+
+    # ✅ CURRENT DEPLOYMENT (VERY IMPORTANT)
+    "https://mca-study-pecvt0x2d-shanmukhas-projects-7e30e8f5.vercel.app",
+]
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
