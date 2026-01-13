@@ -14,8 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 # SECURITY
 # ======================
-SECRET_KEY = "django-insecure-change-this-in-production"
-
+SECRET_KEY = "django-insecure-change-this-later"
 DEBUG = True
 
 ALLOWED_HOSTS = [
@@ -29,7 +28,7 @@ ALLOWED_HOSTS = [
 # APPLICATIONS
 # ======================
 INSTALLED_APPS = [
-    "corsheaders",  # ✅ ONLY ONCE
+    "corsheaders",
 
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,16 +51,18 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ======================
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # ✅ MUST BE FIRST
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+
+    # ❌ CSRF REMOVED (API + TokenAuth)
+    # "django.middleware.csrf.CsrfViewMiddleware",
+
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 
 
 # ======================
@@ -144,52 +145,16 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = "MCA Study <no-reply@mcastudy.com>"
-
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
 # ======================
-# CORS + CSRF (FIXED)
+# 🔥 FINAL CORS FIX (IMPORTANT)
 # ======================
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://mca-study-hub.vercel.app",
-]
-
-# ======================
-# CORS SETTINGS (API SAFE)
-# ======================
+# Allow ALL origins (needed for Vercel preview URLs)
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
-
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
-
-CORS_ALLOW_METHODS = [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://mca-study-hub.vercel.app",
-]
 
 
 # ======================
