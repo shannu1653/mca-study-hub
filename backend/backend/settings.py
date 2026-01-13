@@ -67,12 +67,11 @@ MIDDLEWARE = [
 # URLS / WSGI
 # ======================
 ROOT_URLCONF = "backend.urls"
-
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # ======================
-# TEMPLATES (NOT USED FOR EMAIL)
+# TEMPLATES
 # ======================
 TEMPLATES = [
     {
@@ -148,6 +147,9 @@ DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
+# ======================
+# ✅ CORS (FINAL FIX)
+# ======================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
@@ -155,13 +157,39 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+
+# ======================
+# ✅ CSRF (IMPORTANT FOR LOGIN)
+# ======================
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
+]
+
+
 # ======================
 # INTERNATIONALIZATION
 # ======================
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
 USE_TZ = True
 
@@ -170,7 +198,4 @@ USE_TZ = True
 # STATIC FILES
 # ======================
 STATIC_URL = "/static/"
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-
