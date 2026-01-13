@@ -163,22 +163,19 @@ FRONTEND_URL = os.getenv(
 # CORS (FINAL – PRODUCTION SAFE)
 # ======================
 
-CORS_ALLOWED_ORIGINS = [
-    # Local
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+# ======================
+# CORS (FINAL – STABLE & SAFE)
+# ======================
 
-    # Main Vercel domain
-    "https://mca-study-hub.vercel.app",
-
-    # Any Vercel preview deployment
-    "https://mca-study-pecvt0x2d-shanmukhas-projects-7e30e8f5.vercel.app",
-]
-
-# Optional but SAFE
 CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOW_CREDENTIALS = False  # Token auth only
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:5173$",
+    r"^http://127\.0\.0\.1:5173$",
+    r"^https://.*\.vercel\.app$",
+]
+
+CORS_ALLOW_CREDENTIALS = False
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -197,6 +194,7 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
 
 
 # ======================
