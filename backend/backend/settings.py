@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ["mca-study-hub.onrender.com",
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
