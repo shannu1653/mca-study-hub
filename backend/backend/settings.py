@@ -146,12 +146,12 @@ DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
-
 # ======================
-# ✅ CORS (FINAL FIX)
+# CORS (LOCAL + VERCEL)
 # ======================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
 ]
 
@@ -175,14 +175,12 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
-
-# ======================
-# ✅ CSRF (IMPORTANT FOR LOGIN)
-# ======================
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
 ]
+
 
 
 # ======================
