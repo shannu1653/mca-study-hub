@@ -1,5 +1,5 @@
 """
-Django settings for backend project.
+Django settings for backend project
 """
 
 from pathlib import Path
@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 # SECURITY
 # ======================
-SECRET_KEY = "django-insecure-!n53e(ws6_#c&&3($y1xq5d*rg4d%b5o99kxs+t0j4xpj(apz-"
+SECRET_KEY = "django-insecure-change-this-in-production"
 
 DEBUG = True
 
@@ -142,45 +142,48 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
+DEFAULT_FROM_EMAIL = "MCA Study <no-reply@mcastudy.com>"
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
+
 # ======================
-# CORS (LOCAL + VERCEL)
+# CORS + CSRF (FIXED)
 # ======================
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
+    "https://mca-study-hub.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_HEADERS = [
     "accept",
+    "accept-encoding",
     "authorization",
     "content-type",
+    "origin",
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
 ]
 
 CORS_ALLOW_METHODS = [
-    "DELETE",
     "GET",
-    "OPTIONS",
-    "PATCH",
     "POST",
     "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://mca-study-cul4sd89b-shanmukhas-projects-7e30e8f5.vercel.app",
+    "https://mca-study-hub.vercel.app",
 ]
-
 
 
 # ======================

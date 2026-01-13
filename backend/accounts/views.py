@@ -1,13 +1,24 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.core.mail import send_mail
+
 from .serializers import RegisterSerializer, LoginSerializer
+from .models import PasswordResetToken
+
+User = get_user_model()
 
 
+# =========================
+# REGISTER
+# =========================
 class RegisterView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -16,44 +27,40 @@ class RegisterView(APIView):
             user = serializer.save()
             token, _ = Token.objects.get_or_create(user=user)
 
-            return Response({
-                "message": "User registered successfully",
-                "token": token.key
-            }, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "message": "User registered successfully",
+                    "token": token.key,
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# =========================
+# LOGIN
+# =========================
 class LoginView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.validated_data['user']
+            user = serializer.validated_data["user"]
             token, _ = Token.objects.get_or_create(user=user)
 
-            return Response({
-                "message": "Login successful",
-                "token": token.key,
-                "is_admin": user.is_staff
-            })
+            return Response(
+                {
+                    "message": "Login successful",
+                    "token": token.key,
+                    "is_admin": user.is_staff,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.core.mail import send_mail
-
-from .models import PasswordResetToken
-
-User = get_user_model()
 
 
 # =========================
@@ -65,35 +72,29 @@ class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
 
+        # ✅ Always return success (security best practice)
         if not email:
             return Response(
-                {"error": "Email is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "If email exists, reset link sent"},
+                status=status.HTTP_200_OK,
             )
 
         try:
             user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            # Security: don't reveal user existence
-            return Response(
-                {"message": "If email exists, reset link sent"},
-                status=status.HTTP_200_OK
-            )
 
-        # Delete old tokens
-        PasswordResetToken.objects.filter(user=user).delete()
+            # Delete old tokens
+            PasswordResetToken.objects.filter(user=user).delete()
 
-        # Create new token
-        reset_token = PasswordResetToken.objects.create(user=user)
+            # Create new token
+            reset_token = PasswordResetToken.objects.create(user=user)
 
-        frontend_url = settings.FRONTEND_URL.rstrip("/")
-        reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
+            frontend_url = settings.FRONTEND_URL.rstrip("/")
+            reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
 
-        # Send email (PLAIN TEXT)
-        send_mail(
-            subject="Reset your MCA Study password",
-            message=f"""
-Hello {user.email},
+            send_mail(
+                subject="Reset your MCA Study password",
+                message=f"""
+Hello,
 
 You requested a password reset.
 
@@ -104,14 +105,17 @@ If you did not request this, ignore this email.
 
 – MCA Study Team
 """,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,  # ✅ prevent 500 errors
+            )
+
+        except User.DoesNotExist:
+            pass  # 🔒 Do nothing (do NOT reveal user existence)
 
         return Response(
-            {"message": "Password reset link sent"},
-            status=status.HTTP_200_OK
+            {"message": "If email exists, reset link sent"},
+            status=status.HTTP_200_OK,
         )
 
 
@@ -127,7 +131,7 @@ class ResetPasswordView(APIView):
         if not password:
             return Response(
                 {"error": "Password is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -135,17 +139,16 @@ class ResetPasswordView(APIView):
         except PasswordResetToken.DoesNotExist:
             return Response(
                 {"error": "Invalid or expired token"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = reset_obj.user
         user.set_password(password)
         user.save()
 
-        # One-time use token
         reset_obj.delete()
 
         return Response(
             {"message": "Password reset successful"},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
