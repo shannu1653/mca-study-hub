@@ -66,13 +66,20 @@ class LoginView(APIView):
 # =========================
 # FORGOT PASSWORD (SEND LINK)
 # =========================
+# =========================
+# FORGOT PASSWORD (SEND LINK) - FIXED
+# =========================
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
+
+    # ✅ Handle CORS preflight
+    def options(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
         email = request.data.get("email")
 
-        # ✅ Always return success (security best practice)
+        # ✅ Always return success (security)
         if not email:
             return Response(
                 {"message": "If email exists, reset link sent"},
@@ -93,30 +100,26 @@ class ForgotPasswordView(APIView):
 
             send_mail(
                 subject="Reset your MCA Study password",
-                message=f"""
-Hello,
-
-You requested a password reset.
-
-Click the link below to reset your password:
-{reset_link}
-
-If you did not request this, ignore this email.
-
-– MCA Study Team
-""",
+                message=(
+                    "Hello,\n\n"
+                    "You requested a password reset.\n\n"
+                    f"Click the link below to reset your password:\n{reset_link}\n\n"
+                    "If you did not request this, ignore this email.\n\n"
+                    "– MCA Study Team"
+                ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
-                fail_silently=True,  # ✅ prevent 500 errors
+                fail_silently=False,  # ❗ IMPORTANT (show errors)
             )
 
         except User.DoesNotExist:
-            pass  # 🔒 Do nothing (do NOT reveal user existence)
+            pass  # Do not reveal user existence
 
         return Response(
             {"message": "If email exists, reset link sent"},
             status=status.HTTP_200_OK,
         )
+
 
 
 # =========================
