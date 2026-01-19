@@ -20,7 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = os.getenv("DEBUG") == "True"
+
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -98,22 +99,30 @@ TEMPLATES = [
 # ======================
 
 
+DB_SSL_CA = os.getenv("DB_SSL_CA")
+
+if DB_SSL_CA and DB_SSL_CA.startswith("/etc"):
+    # Render
+    SSL_CA_PATH = DB_SSL_CA
+else:
+    # Local
+    SSL_CA_PATH = BASE_DIR / "ca.pem"
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-        'OPTIONS': {
-            'ssl': {
-                'ca': '/etc/secrets/ca.pem'
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
+        "OPTIONS": {
+            "ssl": {
+                "ca": str(SSL_CA_PATH)
             }
-        }
+        },
     }
 }
-
 
 
 
