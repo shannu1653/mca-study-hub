@@ -102,11 +102,10 @@ TEMPLATES = [
 DB_SSL_CA = os.getenv("DB_SSL_CA")
 
 if DB_SSL_CA and DB_SSL_CA.startswith("/etc"):
-    # Render
     SSL_CA_PATH = DB_SSL_CA
 else:
-    # Local
     SSL_CA_PATH = BASE_DIR / "ca.pem"
+
 
 DATABASES = {
     "default": {
@@ -117,10 +116,10 @@ DATABASES = {
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
         "OPTIONS": {
-            "ssl": {
-                "ca": str(SSL_CA_PATH)
-            }
-        },
+    "ssl": {
+        "ca": str(SSL_CA_PATH)
+    }
+},
     }
 }
 
