@@ -1,2 +1,1 @@
-import pymysql
-pymysql.install_as_MySQLdb()
+# local only (do NOT push to git)
