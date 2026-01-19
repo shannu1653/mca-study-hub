@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "mca-study-hub.onrender.com",
+    ".onrender.com",
 ]
 
 
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "rest_framework",
-    "rest_framework.authtoken",
 
     "accounts",
     "notes",
@@ -150,9 +150,10 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
+
 
 
 

@@ -2,7 +2,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -17,6 +16,8 @@ User = get_user_model()
 # =========================
 # REGISTER
 # =========================
+from rest_framework_simplejwt.tokens import RefreshToken
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -25,12 +26,14 @@ class RegisterView(APIView):
 
         if serializer.is_valid():
             user = serializer.save()
-            token, _ = Token.objects.get_or_create(user=user)
+
+            refresh = RefreshToken.for_user(user)
 
             return Response(
                 {
                     "message": "User registered successfully",
-                    "token": token.key,
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -41,6 +44,8 @@ class RegisterView(APIView):
 # =========================
 # LOGIN
 # =========================
+from rest_framework_simplejwt.tokens import RefreshToken
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -49,12 +54,14 @@ class LoginView(APIView):
 
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-            token, _ = Token.objects.get_or_create(user=user)
+
+            refresh = RefreshToken.for_user(user)
 
             return Response(
                 {
                     "message": "Login successful",
-                    "token": token.key,
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
                     "is_admin": user.is_staff,
                 },
                 status=status.HTTP_200_OK,
