@@ -96,7 +96,7 @@ TEMPLATES = [
 # ======================
 # DATABASE (MySQL + SSL)
 # ======================
-import os
+
 
 DATABASES = {
     'default': {
