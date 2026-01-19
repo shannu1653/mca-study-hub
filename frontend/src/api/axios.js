@@ -9,10 +9,15 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access"); // ✅ FIXED
+    const token = localStorage.getItem("access");
 
-    if (token) {
-      config.headers.Authorization = `Token ${token}`;
+    // ✅ Only attach token if request is NOT login/register
+    if (
+      token &&
+      !config.url.includes("login") &&
+      !config.url.includes("register")
+    ) {
+      config.headers.Authorization = `Bearer ${token}`; // ✅ FIX
     }
 
     return config;
