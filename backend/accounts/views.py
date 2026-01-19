@@ -7,6 +7,8 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.mail import send_mail
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .serializers import RegisterSerializer, LoginSerializer
 from .models import PasswordResetToken
 
@@ -16,8 +18,6 @@ User = get_user_model()
 # =========================
 # REGISTER
 # =========================
-from rest_framework_simplejwt.tokens import RefreshToken
-
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -44,8 +44,6 @@ class RegisterView(APIView):
 # =========================
 # LOGIN
 # =========================
-from rest_framework_simplejwt.tokens import RefreshToken
-
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -73,20 +71,16 @@ class LoginView(APIView):
 # =========================
 # FORGOT PASSWORD (SEND LINK)
 # =========================
-# =========================
-# FORGOT PASSWORD (SEND LINK) - FIXED
-# =========================
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
 
-    # ✅ Handle CORS preflight
     def options(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
         email = request.data.get("email")
 
-        # ✅ Always return success (security)
+        # Always return success (security)
         if not email:
             return Response(
                 {"message": "If email exists, reset link sent"},
@@ -96,31 +90,31 @@ class ForgotPasswordView(APIView):
         try:
             user = User.objects.get(email=email)
 
-            # Delete old tokens
             PasswordResetToken.objects.filter(user=user).delete()
-
-            # Create new token
             reset_token = PasswordResetToken.objects.create(user=user)
 
             frontend_url = settings.FRONTEND_URL.rstrip("/")
             reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
 
-            send_mail(
-                subject="Reset your MCA Study password",
-                message=(
-                    "Hello,\n\n"
-                    "You requested a password reset.\n\n"
-                    f"Click the link below to reset your password:\n{reset_link}\n\n"
-                    "If you did not request this, ignore this email.\n\n"
-                    "– MCA Study Team"
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,  # ❗ IMPORTANT (show errors)
-            )
+            try:
+                send_mail(
+                    subject="Reset your MCA Study password",
+                    message=(
+                        "Hello,\n\n"
+                        "You requested a password reset.\n\n"
+                        f"Click the link below:\n{reset_link}\n\n"
+                        "If you did not request this, ignore this email.\n\n"
+                        "– MCA Study Team"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=True,  # ✅ IMPORTANT FOR LIVE
+                )
+            except Exception:
+                pass
 
         except User.DoesNotExist:
-            pass  # Do not reveal user existence
+            pass
 
         return Response(
             {"message": "If email exists, reset link sent"},
@@ -128,9 +122,8 @@ class ForgotPasswordView(APIView):
         )
 
 
-
 # =========================
-# RESET PASSWORD (FROM REACT)
+# RESET PASSWORD
 # =========================
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
