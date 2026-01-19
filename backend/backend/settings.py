@@ -5,8 +5,8 @@ Django settings for backend project.
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 
 # ======================
 # BASE DIR
@@ -19,7 +19,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
-# ❌ DEBUG must be False on Render
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "rest_framework",
+    "rest_framework_simplejwt",
 
     "accounts",
     "notes",
@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 # ======================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # must be here
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -96,10 +96,7 @@ TEMPLATES = [
 # ======================
 # DATABASE
 # ======================
-
-
-
-if os.getenv("RENDER") == "true":
+if os.getenv("RENDER"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -140,11 +137,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # ======================
 AUTH_USER_MODEL = "accounts.User"
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 # ======================
-# REST FRAMEWORK
+# REST FRAMEWORK (JWT ONLY)
 # ======================
-# settings.py
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -155,25 +155,31 @@ REST_FRAMEWORK = {
 }
 
 
+# ======================
+# SIMPLE JWT SETTINGS (IMPORTANT)
+# ======================
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
 
 
 # ======================
 # EMAIL (GMAIL SMTP)
 # ======================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = "MCA Study <pentashanmukha2002@gmail.com>"
 
-# ✅ Used for reset password link
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
     "https://mca-study-hub.vercel.app"
@@ -181,16 +187,8 @@ FRONTEND_URL = os.getenv(
 
 
 # ======================
-# CORS (RENDER + VERCEL SAFE)
+# CORS
 # ======================
-# ======================
-# CORS (FINAL – PRODUCTION SAFE)
-# ======================
-
-# ======================
-# CORS (FINAL – STABLE & SAFE)
-# ======================
-
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
@@ -220,7 +218,6 @@ CORS_ALLOW_METHODS = [
 ]
 
 
-
 # ======================
 # INTERNATIONALIZATION
 # ======================
@@ -231,17 +228,15 @@ USE_TZ = True
 
 
 # ======================
-# STATIC FILES (RENDER)
+# STATIC FILES
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-
 # ======================
-# HTTPS FIX FOR RENDER
+# HTTPS FIX (RENDER)
 # ======================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
