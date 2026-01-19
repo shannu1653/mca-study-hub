@@ -4,8 +4,8 @@ Django settings for backend project
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 from datetime import timedelta
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,8 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
-DEBUG = os.getenv("DEBUG") == "True"
-
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -95,33 +94,38 @@ TEMPLATES = [
 
 
 # ======================
-# DATABASE (MySQL + SSL)
+# DATABASE (LOCAL + RENDER SAFE)
 # ======================
+RENDER = os.getenv("RENDER") == "true"
 
-
-DB_SSL_CA = os.getenv("DB_SSL_CA")
-
-if DB_SSL_CA and DB_SSL_CA.startswith("/etc"):
-    SSL_CA_PATH = DB_SSL_CA
+if RENDER:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
+            "OPTIONS": {
+                "ssl": {
+                    "ca": "/etc/secrets/ca.pem"
+                }
+            },
+        }
+    }
 else:
-    SSL_CA_PATH = BASE_DIR / "ca.pem"
-
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-        "OPTIONS": {
-    "ssl": {
-        "ca": str(SSL_CA_PATH)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
+        }
     }
-},
-    }
-}
+
 
 
 
@@ -141,13 +145,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # ======================
 AUTH_USER_MODEL = "accounts.User"
 
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
-
 
 # ======================
-# REST FRAMEWORK (JWT)
+# REST FRAMEWORK
 # ======================
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -160,7 +160,7 @@ REST_FRAMEWORK = {
 
 
 # ======================
-# SIMPLE JWT
+# JWT
 # ======================
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
@@ -199,8 +199,6 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
 ]
 
-CORS_ALLOW_CREDENTIALS = False
-
 CORS_ALLOW_HEADERS = [
     "accept",
     "authorization",
@@ -235,13 +233,11 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # ======================
-# HTTPS FIX (RENDER)
+# RENDER HTTPS FIX
 # ======================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 

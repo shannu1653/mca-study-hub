@@ -15,18 +15,13 @@ from .models import PasswordResetToken
 User = get_user_model()
 
 
-# =========================
-# REGISTER
-# =========================
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
-
         if serializer.is_valid():
             user = serializer.save()
-
             refresh = RefreshToken.for_user(user)
 
             return Response(
@@ -41,18 +36,13 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# =========================
-# LOGIN
-# =========================
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-
             refresh = RefreshToken.for_user(user)
 
             return Response(
@@ -68,90 +58,51 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# =========================
-# FORGOT PASSWORD (SEND LINK)
-# =========================
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
-
-    def options(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_200_OK)
 
     def post(self, request):
         email = request.data.get("email")
 
-        # Always return success (security)
         if not email:
-            return Response(
-                {"message": "If email exists, reset link sent"},
-                status=status.HTTP_200_OK,
-            )
+            return Response({"message": "If email exists, reset link sent"})
 
         try:
             user = User.objects.get(email=email)
-
             PasswordResetToken.objects.filter(user=user).delete()
-            reset_token = PasswordResetToken.objects.create(user=user)
+            reset = PasswordResetToken.objects.create(user=user)
 
-            frontend_url = settings.FRONTEND_URL.rstrip("/")
-            reset_link = f"{frontend_url}/reset-password/{reset_token.token}"
+            reset_link = f"{settings.FRONTEND_URL}/reset-password/{reset.token}"
 
-            try:
-                send_mail(
-                    subject="Reset your MCA Study password",
-                    message=(
-                        "Hello,\n\n"
-                        "You requested a password reset.\n\n"
-                        f"Click the link below:\n{reset_link}\n\n"
-                        "If you did not request this, ignore this email.\n\n"
-                        "– MCA Study Team"
-                    ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[user.email],
-                    fail_silently=True,  # ✅ IMPORTANT FOR LIVE
-                )
-            except Exception:
-                pass
-
+            send_mail(
+                "Reset your password",
+                f"Click here to reset your password:\n{reset_link}",
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=True,
+            )
         except User.DoesNotExist:
             pass
 
-        return Response(
-            {"message": "If email exists, reset link sent"},
-            status=status.HTTP_200_OK,
-        )
+        return Response({"message": "If email exists, reset link sent"})
 
 
-# =========================
-# RESET PASSWORD
-# =========================
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, token):
         password = request.data.get("password")
-
         if not password:
-            return Response(
-                {"error": "Password is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"error": "Password required"}, status=400)
 
         try:
-            reset_obj = PasswordResetToken.objects.get(token=token)
+            reset = PasswordResetToken.objects.get(token=token)
         except PasswordResetToken.DoesNotExist:
-            return Response(
-                {"error": "Invalid or expired token"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"error": "Invalid token"}, status=400)
 
-        user = reset_obj.user
+        user = reset.user
         user.set_password(password)
         user.save()
+        reset.delete()
 
-        reset_obj.delete()
-
-        return Response(
-            {"message": "Password reset successful"},
-            status=status.HTTP_200_OK,
-        )
+        return Response({"message": "Password reset successful"})

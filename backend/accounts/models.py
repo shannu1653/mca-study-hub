@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
             email=email,
             password=password,
             is_staff=True,
-            is_superuser=True
+            is_superuser=True,
         )
 
 
@@ -30,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
@@ -39,9 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-
 import uuid
-from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
