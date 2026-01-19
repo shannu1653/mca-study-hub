@@ -1,10 +1,11 @@
 """
-Django settings for backend project.
+Django settings for backend project
 """
 
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -19,8 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ======================
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
-
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -94,31 +94,27 @@ TEMPLATES = [
 
 
 # ======================
-# DATABASE
+# DATABASE (MySQL + SSL)
 # ======================
-if os.getenv("RENDER"):
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-            "OPTIONS": {
-                "ssl": {
-                    "ca": os.path.join(BASE_DIR, "aiven-ca.pem"),
-                }
+DB_SSL_CA = os.path.join(BASE_DIR, os.getenv("DB_SSL_CA"))
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "ssl": {
+                "ca": DB_SSL_CA,
             },
-        }
+        },
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
+
 
 
 # ======================
@@ -143,7 +139,7 @@ AUTHENTICATION_BACKENDS = [
 
 
 # ======================
-# REST FRAMEWORK (JWT ONLY)
+# REST FRAMEWORK (JWT)
 # ======================
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -156,10 +152,8 @@ REST_FRAMEWORK = {
 
 
 # ======================
-# SIMPLE JWT SETTINGS (IMPORTANT)
+# SIMPLE JWT
 # ======================
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -232,7 +226,10 @@ USE_TZ = True
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
 
 
 # ======================
