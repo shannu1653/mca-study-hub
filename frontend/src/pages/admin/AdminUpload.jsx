@@ -83,8 +83,8 @@ function AdminUpload() {
   }
 
   // ✅ FILE SIZE VALIDATION (50 MB)
-  if (file.size > 50 * 1024 * 1024) {
-    toast.error("PDF size must be under 50 MB");
+  if (file.size > 30 * 1024 * 1024) {
+    toast.error("PDF size must be under 30 MB");
     return;
   }
 
@@ -181,7 +181,7 @@ function AdminUpload() {
             )}
 
             <p className="hint-text">
-              ⚠️ Only PDF · Max 50MB
+              ⚠️ Only PDF · Max 30MB
             </p>
 
             <button
@@ -189,7 +189,7 @@ function AdminUpload() {
               disabled={loading}
               className="upload-btn"
             >
-              {loading ? "Uploading..." : "Upload Note"}
+              {loading ? "Uploading… Please wait ⏳" : "Upload Note"}
             </button>
             
           </form>
