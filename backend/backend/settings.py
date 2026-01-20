@@ -22,12 +22,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "mca-study-hub.onrender.com",
-    ".onrender.com",
-]
+ALLOWED_HOSTS = ["*"]
 
 
 # ======================
@@ -94,9 +89,9 @@ TEMPLATES = [
 
 
 #
-RENDER = os.getenv("RENDER", "false").lower() == "true"
 
-DB_SSL_CA = os.getenv("DB_SSL_CA")
+
+RENDER = os.getenv("RENDER", "false").lower() == "true"
 
 DATABASES = {
     "default": {
@@ -106,13 +101,16 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
-        "OPTIONS": {
-            "ssl": {
-                "ca": DB_SSL_CA
-            }
-        } if RENDER else {},
     }
 }
+
+if RENDER:
+    DATABASES["default"]["OPTIONS"] = {
+        "ssl": {
+            "ca": os.getenv("DB_SSL_CA")
+        }
+    }
+
 
 # ======================
 # PASSWORD VALIDATION
@@ -217,6 +215,7 @@ USE_TZ = True
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
