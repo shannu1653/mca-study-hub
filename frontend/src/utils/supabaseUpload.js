@@ -9,28 +9,35 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 /* ================= UPLOAD PDF ================= */
 export const uploadPDF = async (file) => {
   // ✅ Validate file type
-  if (file.type !== "application/pdf") {
+  if (!file || file.type !== "application/pdf") {
     throw new Error("Only PDF files are allowed");
   }
 
-  // ✅ Validate file size (max 10MB)
+  // ✅ Validate file size (10MB)
   const MAX_SIZE = 10 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
     throw new Error("File size must be less than 10MB");
   }
 
-  // ✅ Unique file path
-  const filePath = `${Date.now()}_${crypto.randomUUID()}.pdf`;
+  // ✅ Safe unique filename (works everywhere)
+  const uniqueId =
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2);
 
-  // ✅ Upload
+  const filePath = `${Date.now()}_${uniqueId}.pdf`;
+
+  // ✅ Upload to Supabase bucket (NO folder name)
   const { error } = await supabase.storage
-    .from("notes")
+    .from("notes") // bucket name
     .upload(filePath, file, {
       cacheControl: "3600",
       upsert: false,
+      contentType: "application/pdf",
     });
 
   if (error) {
+    console.error("Supabase upload error:", error);
     throw error;
   }
 
@@ -38,6 +45,10 @@ export const uploadPDF = async (file) => {
   const { data } = supabase.storage
     .from("notes")
     .getPublicUrl(filePath);
+
+  if (!data?.publicUrl) {
+    throw new Error("Failed to get public URL");
+  }
 
   return data.publicUrl;
 };
