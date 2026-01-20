@@ -17,7 +17,9 @@ function Login() {
     try {
       const res = await api.post("auth/login/", { email, password });
 
-      localStorage.setItem("access", res.data.token);
+      // ✅ FIX: correct token key
+      localStorage.setItem("access", res.data.access);
+      localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("is_admin", res.data.is_admin ? "true" : "false");
 
       toast.success("Welcome back 👋");
@@ -25,7 +27,7 @@ function Login() {
       navigate(res.data.is_admin ? "/admin" : "/notes", {
         replace: true,
       });
-    } catch {
+    } catch (error) {
       toast.error("Invalid email or password");
     } finally {
       setLoading(false);
@@ -58,20 +60,23 @@ function Login() {
             />
             <label>Password</label>
           </div>
-          <p className="auth-link">
-  <span onClick={() => navigate("/forgot-password")}>
-    Forgot password?
-  </span>
-</p>
 
+          <p className="auth-link">
+            <span onClick={() => navigate("/forgot-password")}>
+              Forgot password?
+            </span>
+          </p>
 
           <button type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Login"}
           </button>
-          <p className="auth-link">
-  New user? <span onClick={() => navigate("/register")}>Create account</span>
-</p>
 
+          <p className="auth-link">
+            New user?{" "}
+            <span onClick={() => navigate("/register")}>
+              Create account
+            </span>
+          </p>
         </form>
       </div>
     </div>

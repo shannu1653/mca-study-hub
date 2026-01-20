@@ -14,11 +14,16 @@ function ForgotPassword() {
     setLoading(true);
 
     try {
-      await api.post("auth/forgot-password/", { email });
-      toast.success("Password reset link sent 📩");
+      await api.post("auth/forgot-password/", {
+        email: email.trim(),
+      });
+
+      // ✅ Always show success (security best practice)
+      toast.success("If email exists, reset link sent 📩");
       navigate("/login");
     } catch {
-      toast.error("Email not found");
+      toast.success("If email exists, reset link sent 📩");
+      navigate("/login");
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,15 @@ const isNewNote = (createdAt) => {
 
 /* ================= NOTES PAGE ================= */
 function Notes() {
+  /* ================= AUTH GUARD ================= */
+  const token = localStorage.getItem("access");
+
+  useEffect(() => {
+    if (!token) {
+      window.location.href = "/login";
+    }
+  }, [token]);
+
   /* ================= DATA ================= */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
@@ -32,7 +41,7 @@ function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH ALL ================= */
+  /* ================= FETCH NOTES + YEARS ================= */
   useEffect(() => {
     fetchAll();
   }, []);
@@ -46,8 +55,11 @@ function Notes() {
 
       setNotes(notesRes.data);
       setYears(yearsRes.data);
-    } catch {
-      console.log("Failed to load notes");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
     } finally {
       setLoading(false);
     }
@@ -61,9 +73,10 @@ function Notes() {
       return;
     }
 
-    api.get("notes/semesters/").then((res) => {
-      setSemesters(res.data.filter((s) => s.year === Number(year)));
-    });
+    api
+      .get(`notes/semesters/?year=${year}`)
+      .then((res) => setSemesters(res.data))
+      .catch(() => setSemesters([]));
   }, [year]);
 
   /* ================= FETCH SUBJECTS ================= */
@@ -76,7 +89,8 @@ function Notes() {
 
     api
       .get(`notes/subjects/?semester=${semester}`)
-      .then((res) => setSubjects(res.data));
+      .then((res) => setSubjects(res.data))
+      .catch(() => setSubjects([]));
   }, [semester]);
 
   /* ================= FILTER NOTES ================= */
@@ -108,7 +122,7 @@ function Notes() {
     try {
       await api.post(`notes/${note.id}/download/`);
     } catch {}
-    window.open(note.pdf_url, "_blank");
+    window.open(note.pdf_url, "_blank", "noopener,noreferrer");
   };
 
   /* ================= SWIPE ================= */
@@ -120,8 +134,8 @@ function Notes() {
 
   const onTouchEnd = (e, note) => {
     const diff = e.changedTouches[0].clientX - touchStartX.current;
-    if (diff > 80) handleDownload(note); // swipe right
-    if (diff < -80) toggleBookmark(note.id); // swipe left
+    if (diff > 80) handleDownload(note);
+    if (diff < -80) toggleBookmark(note.id);
   };
 
   /* ================= UI ================= */
