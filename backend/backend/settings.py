@@ -174,7 +174,11 @@ FRONTEND_URL = os.getenv(
 # ======================
 # CORS
 # ======================
+# ======================
+# CORS
+# ======================
 CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:5173$",
@@ -199,6 +203,12 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://mca-study-hub.vercel.app",
+    "https://*.vercel.app",
+]
+
 
 
 # ======================
