@@ -30,13 +30,15 @@ function AdminUpload() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
+
+  
   /* ================= LOAD YEARS ================= */
   useEffect(() => {
     api.get("notes/years/")
       .then(res => setYears(res.data))
       .catch(() => toast.error("Failed to load years"));
   }, []);
-
+  
   /* ================= LOAD SEMESTERS ================= */
   useEffect(() => {
     if (!selectedYear) {
@@ -66,40 +68,62 @@ function AdminUpload() {
 
   /* ================= UPLOAD ================= */
   const handleUpload = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
-      toast.error("Please fill all fields");
-      return;
+  // ✅ Required fields check
+  if (
+    !selectedYear ||
+    !selectedSemester ||
+    !selectedSubject ||
+    !title.trim() ||
+    !file
+  ) {
+    toast.error("All fields are required");
+    return;
+  }
+
+  // ✅ FILE SIZE VALIDATION (50 MB)
+  if (file.size > 50 * 1024 * 1024) {
+    toast.error("PDF size must be under 50 MB");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const pdfUrl = await uploadPDF(file);
+
+    await api.post("notes/", {
+      title: title.trim(),
+      subject: selectedSubject,
+      pdf_url: pdfUrl,
+    });
+
+    toast.success("Note uploaded successfully");
+
+    // 🔄 Reset form
+    setSelectedYear("");
+    setSelectedSemester("");
+    setSelectedSubject("");
+    setTitle("");
+    setFile(null);
+    setSemesters([]);
+    setSubjects([]);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
-
-    setLoading(true);
-
-    try {
-      const pdfUrl = await uploadPDF(file);
-
-      await api.post("notes/", {
-        title: title.trim(),
-        subject: selectedSubject,
-        pdf_url: pdfUrl,
-      });
-
-      toast.success("Note uploaded successfully ✅");
-
-      setSelectedYear("");
-      setSelectedSemester("");
-      setSelectedSubject("");
-      setTitle("");
-      setFile(null);
-      setSemesters([]);
-      setSubjects([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch {
+  } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/login";
+    } else {
       toast.error("Upload failed");
-    } finally {
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Layout>
@@ -156,7 +180,7 @@ function AdminUpload() {
               </p>
             )}
 
-            <p className="upload-hint">
+            <p className="hint-text">
               ⚠️ Only PDF · Max 50MB
             </p>
 
@@ -167,6 +191,7 @@ function AdminUpload() {
             >
               {loading ? "Uploading..." : "Upload Note"}
             </button>
+            
           </form>
         </div>
       </div>
