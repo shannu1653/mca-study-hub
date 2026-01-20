@@ -20,7 +20,7 @@ export const uploadPDF = async (file) => {
   }
 
   // ✅ Unique file path
-  const filePath = `notes/${Date.now()}_${crypto.randomUUID()}.pdf`;
+  const filePath = `${Date.now()}_${crypto.randomUUID()}.pdf`;
 
   // ✅ Upload
   const { error } = await supabase.storage
