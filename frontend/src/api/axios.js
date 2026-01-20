@@ -1,12 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://mca-study-hub.onrender.com/api/",
+  // ✅ Use environment variable (works for local + Vercel)
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// ✅ Attach JWT token automatically
 api.interceptors.request.use(
   (config) => {
     const token =

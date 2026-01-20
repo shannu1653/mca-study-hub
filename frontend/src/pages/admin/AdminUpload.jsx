@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Layout from "../../layout/Layout";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
@@ -6,18 +6,29 @@ import "../../styles/adminUpload.css";
 import { uploadPDF } from "../../utils/supabaseUpload";
 
 function AdminUpload() {
-  /* Backend data */
+  /* ================= AUTH GUARD ================= */
+  const token = localStorage.getItem("access");
+  const isAdmin = localStorage.getItem("is_admin") === "true";
+
+  useEffect(() => {
+    if (!token || !isAdmin) {
+      window.location.href = "/login";
+    }
+  }, [token, isAdmin]);
+
+  /* ================= BACKEND DATA ================= */
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
 
-  /* Form state */
+  /* ================= FORM STATE ================= */
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   /* ================= LOAD YEARS ================= */
   useEffect(() => {
@@ -28,28 +39,33 @@ function AdminUpload() {
     try {
       const res = await api.get("notes/years/");
       setYears(res.data);
-    } catch {
-      toast.error("Failed to load years");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        window.location.href = "/login";
+      } else {
+        toast.error("Failed to load years");
+      }
     }
   };
 
   /* ================= LOAD SEMESTERS ================= */
   useEffect(() => {
-    if (selectedYear) {
-      fetchSemesters(selectedYear);
+    if (!selectedYear) {
+      setSemesters([]);
       setSelectedSemester("");
       setSelectedSubject("");
       setSubjects([]);
+      return;
     }
+
+    fetchSemesters(selectedYear);
   }, [selectedYear]);
 
   const fetchSemesters = async (yearId) => {
     try {
-      const res = await api.get("notes/semesters/");
-      const filtered = res.data.filter(
-        (s) => s.year === Number(yearId)
-      );
-      setSemesters(filtered);
+      const res = await api.get(`notes/semesters/?year=${yearId}`);
+      setSemesters(res.data);
     } catch {
       toast.error("Failed to load semesters");
     }
@@ -57,10 +73,13 @@ function AdminUpload() {
 
   /* ================= LOAD SUBJECTS ================= */
   useEffect(() => {
-    if (selectedSemester) {
-      fetchSubjects(selectedSemester);
+    if (!selectedSemester) {
+      setSubjects([]);
       setSelectedSubject("");
+      return;
     }
+
+    fetchSubjects(selectedSemester);
   }, [selectedSemester]);
 
   const fetchSubjects = async (semesterId) => {
@@ -82,7 +101,7 @@ function AdminUpload() {
       !selectedYear ||
       !selectedSemester ||
       !selectedSubject ||
-      !title ||
+      !title.trim() ||
       !file
     ) {
       toast.error("All fields are required");
@@ -95,7 +114,7 @@ function AdminUpload() {
       const pdfUrl = await uploadPDF(file);
 
       await api.post("notes/", {
-        title,
+        title: title.trim(),
         subject: selectedSubject,
         pdf_url: pdfUrl,
       });
@@ -110,13 +129,22 @@ function AdminUpload() {
       setFile(null);
       setSemesters([]);
       setSubjects([]);
-    } catch {
-      toast.error("Upload failed");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        window.location.href = "/login";
+      } else {
+        toast.error("Upload failed");
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= UI ================= */
   return (
     <Layout>
       <div className="upload-page">
@@ -187,6 +215,7 @@ function AdminUpload() {
 
             {/* FILE */}
             <input
+              ref={fileInputRef}
               type="file"
               accept="application/pdf"
               onChange={(e) => setFile(e.target.files[0])}
