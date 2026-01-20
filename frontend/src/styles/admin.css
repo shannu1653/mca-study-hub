@@ -1,28 +1,106 @@
+/* 🃏 ADMIN CARD */
 .admin-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 16px;
   max-width: 420px;
+  width: 100%;
+  margin: auto;
+  border: 1px solid #e5e7eb;
+
+  /* premium depth */
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease both;
 }
 
+/* 🌊 CARD ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🧩 FORM ROW */
 .admin-form-row {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
+/* ✏️ INPUT */
 .admin-form-row input {
   flex: 1;
-  padding: 8px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* ✨ INPUT FOCUS */
+.admin-form-row input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* 📄 LIST ITEM */
 .admin-list-item {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  font-size: 14px;
+  transition: background 0.25s ease, transform 0.25s ease;
 }
 
+/* 🔁 LIST HOVER */
+.admin-list-item:hover {
+  background: #eef2ff;
+  transform: translateX(4px);
+}
+
+/* 🔴 DANGER BUTTON */
 button.danger {
-  background: #ef4444;
-  color: white;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 🚨 DANGER HOVER */
+button.danger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+
+/* 📱 MOBILE */
+@media (max-width: 480px) {
+  .admin-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .admin-form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  button.danger {
+    width: 100%;
+  }
 }

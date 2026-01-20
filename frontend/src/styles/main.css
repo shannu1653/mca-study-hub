@@ -1,55 +1,112 @@
-/* RESET */
-* {
+/* 🔁 RESET */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* 🌐 ROOT */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --bg: #f5f7fb;
+  --text: #1f2937;
+  --border: #d1d5db;
+  --radius: 10px;
+}
 
+/* 🧠 BODY */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 🔗 LINKS */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* 🔘 BUTTON */
 button {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* BODY */
-body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f5f7fb;
-  color: #333;
-}
-
-/* LINKS */
-a {
-  color: #2563eb;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* BUTTON */
-button {
-  padding: 10px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #1e40af;
-}
-
-/* INPUT */
+/* ✏️ INPUTS */
 input,
-select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+select,
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ✨ INPUT FOCUS */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* 🚫 DISABLED INPUT */
+input:disabled,
+select:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* 📱 MOBILE TOUCH */
+@media (max-width: 480px) {
+  button {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  input,
+  select {
+    padding: 12px;
+  }
 }

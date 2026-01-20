@@ -1,23 +1,33 @@
+/* 🌐 ROOT APP CONTAINER */
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
   text-align: center;
 }
 
+/* ⚛️ LOGO */
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  height: 5.5em;
+  padding: 1.2em;
+  will-change: transform, filter;
+  transition:
+    transform 0.4s ease,
+    filter 0.4s ease;
 }
 
+/* ✨ LOGO HOVER */
+.logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 1.5em rgba(100, 108, 255, 0.6));
+}
+
+/* ⚛️ REACT LOGO SPECIAL */
+.logo.react:hover {
+  filter: drop-shadow(0 0 1.5em rgba(97, 218, 251, 0.6));
+}
+
+/* 🔄 LOGO SPIN */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -27,16 +37,56 @@
   }
 }
 
+/* 🎞️ ANIMATION RESPECT */
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+    animation: logo-spin 18s linear infinite;
   }
 }
 
+/* 🃏 CARD */
 .card {
-  padding: 2em;
+  padding: 2rem;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+  margin: 1.5rem auto;
+  max-width: 520px;
+  animation: fadeUp 0.6s ease both;
 }
 
+/* 🌊 CARD ANIMATION */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 📘 DOC TEXT */
 .read-the-docs {
-  color: #888;
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 14px;
+}
+
+/* 📱 MOBILE */
+@media (max-width: 480px) {
+  #root {
+    padding: 1.5rem 1rem;
+  }
+
+  .logo {
+    height: 4.5em;
+    padding: 1em;
+  }
+
+  .card {
+    padding: 1.5rem;
+    border-radius: 14px;
+  }
 }
