@@ -12,9 +12,11 @@ export const uploadPDF = async (file) => {
     throw new Error("Only PDF files allowed");
   }
 
-  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
+  // ✅ sanitize name
+  const safeName = file.name.replace(/\s+/g, "_").replace(/[()]/g, "");
+  const fileName = `${Date.now()}_${safeName}`;
 
-  // ✅ IMPORTANT: folder inside bucket
+  // ✅ folder path is REQUIRED
   const filePath = `pdfs/${fileName}`;
 
   const { error } = await supabase.storage
@@ -25,7 +27,7 @@ export const uploadPDF = async (file) => {
     });
 
   if (error) {
-    console.error("Supabase upload error:", error);
+    console.error("Upload error:", error);
     throw error;
   }
 
