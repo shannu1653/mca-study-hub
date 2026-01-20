@@ -16,12 +16,12 @@ function AdminUpload() {
     }
   }, [token, isAdmin]);
 
-  /* ================= BACKEND DATA ================= */
+  /* ================= DATA ================= */
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
 
-  /* ================= FORM STATE ================= */
+  /* ================= FORM ================= */
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -32,22 +32,10 @@ function AdminUpload() {
 
   /* ================= LOAD YEARS ================= */
   useEffect(() => {
-    fetchYears();
+    api.get("notes/years/")
+      .then(res => setYears(res.data))
+      .catch(() => toast.error("Failed to load years"));
   }, []);
-
-  const fetchYears = async () => {
-    try {
-      const res = await api.get("notes/years/");
-      setYears(res.data);
-    } catch (error) {
-      if (error.response?.status === 401) {
-        localStorage.clear();
-        window.location.href = "/login";
-      } else {
-        toast.error("Failed to load years");
-      }
-    }
-  };
 
   /* ================= LOAD SEMESTERS ================= */
   useEffect(() => {
@@ -55,21 +43,13 @@ function AdminUpload() {
       setSemesters([]);
       setSelectedSemester("");
       setSelectedSubject("");
-      setSubjects([]);
       return;
     }
 
-    fetchSemesters(selectedYear);
+    api.get(`notes/semesters/?year=${selectedYear}`)
+      .then(res => setSemesters(res.data))
+      .catch(() => toast.error("Failed to load semesters"));
   }, [selectedYear]);
-
-  const fetchSemesters = async (yearId) => {
-    try {
-      const res = await api.get(`notes/semesters/?year=${yearId}`);
-      setSemesters(res.data);
-    } catch {
-      toast.error("Failed to load semesters");
-    }
-  };
 
   /* ================= LOAD SUBJECTS ================= */
   useEffect(() => {
@@ -79,32 +59,17 @@ function AdminUpload() {
       return;
     }
 
-    fetchSubjects(selectedSemester);
+    api.get(`notes/subjects/?semester=${selectedSemester}`)
+      .then(res => setSubjects(res.data))
+      .catch(() => toast.error("Failed to load subjects"));
   }, [selectedSemester]);
-
-  const fetchSubjects = async (semesterId) => {
-    try {
-      const res = await api.get(
-        `notes/subjects/?semester=${semesterId}`
-      );
-      setSubjects(res.data);
-    } catch {
-      toast.error("Failed to load subjects");
-    }
-  };
 
   /* ================= UPLOAD ================= */
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (
-      !selectedYear ||
-      !selectedSemester ||
-      !selectedSubject ||
-      !title.trim() ||
-      !file
-    ) {
-      toast.error("All fields are required");
+    if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
+      toast.error("Please fill all fields");
       return;
     }
 
@@ -119,9 +84,8 @@ function AdminUpload() {
         pdf_url: pdfUrl,
       });
 
-      toast.success("Note uploaded successfully");
+      toast.success("Note uploaded successfully ✅");
 
-      /* Reset form */
       setSelectedYear("");
       setSelectedSemester("");
       setSelectedSubject("");
@@ -129,100 +93,78 @@ function AdminUpload() {
       setFile(null);
       setSemesters([]);
       setSubjects([]);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        localStorage.clear();
-        window.location.href = "/login";
-      } else {
-        toast.error("Upload failed");
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch {
+      toast.error("Upload failed");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= UI ================= */
   return (
     <Layout>
-      <div className="upload-page">
+      <div className="upload-wrapper">
         <div className="upload-card">
           <h2>Upload Notes</h2>
-          <p>Add new MCA study material</p>
+          <p className="subtitle">Add MCA study material (PDF only)</p>
 
           <form onSubmit={handleUpload}>
-            {/* YEAR */}
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-            >
+            <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
               <option value="">Select MCA Year</option>
-              {years.map((y) => (
-                <option key={y.id} value={y.id}>
-                  {y.name}
-                </option>
-              ))}
+              {years.map(y => <option key={y.id} value={y.id}>{y.name}</option>)}
             </select>
 
-            {/* SEMESTER */}
             <select
               value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
+              onChange={e => setSelectedSemester(e.target.value)}
               disabled={!selectedYear}
             >
               <option value="">Select Semester</option>
-              {semesters.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
+              {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
 
-            {/* SUBJECT */}
             <select
               value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
+              onChange={e => setSelectedSubject(e.target.value)}
               disabled={!selectedSemester}
             >
               <option value="">
-                {selectedSemester
-                  ? "Select Subject"
-                  : "Select Semester first"}
+                {selectedSemester ? "Select Subject" : "Select semester first"}
               </option>
-
-              {subjects.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
+              {subjects.map(sub => (
+                <option key={sub.id} value={sub.id}>{sub.name}</option>
               ))}
             </select>
 
-            {selectedSemester && subjects.length === 0 && (
-              <p className="hint-text">
-                No subjects found for selected semester
-              </p>
-            )}
-
-            {/* TITLE */}
             <input
               type="text"
               placeholder="Note title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
             />
 
-            {/* FILE */}
             <input
               ref={fileInputRef}
               type="file"
               accept="application/pdf"
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={e => setFile(e.target.files[0])}
             />
 
-            {/* SUBMIT */}
-            <button type="submit" disabled={loading}>
+            {file && (
+              <p className="file-info">
+                📄 {(file.size / (1024 * 1024)).toFixed(2)} MB selected
+              </p>
+            )}
+
+            <p className="upload-hint">
+              ⚠️ Only PDF · Max 50MB
+            </p>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="upload-btn"
+            >
               {loading ? "Uploading..." : "Upload Note"}
             </button>
           </form>
