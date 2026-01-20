@@ -121,7 +121,7 @@ function Notes() {
   const handleDownload = async (note) => {
     try {
       await api.post(`notes/${note.id}/download/`);
-    } catch {}
+    } catch { }
     window.open(note.pdf_url, "_blank", "noopener,noreferrer");
   };
 
@@ -138,6 +138,21 @@ function Notes() {
     if (diff < -80) toggleBookmark(note.id);
   };
 
+  /* ================= TRENDING NOTES ================= */
+  const trendingNotes = notes
+    .filter(
+      (n) => (n.download_count || 0) >= 5 || isNewNote(n.created_at)
+    )
+    .slice(0, 4);
+  const handleView = (note) => {
+    window.open(note.pdf_url, "_blank", "noopener,noreferrer");
+  };
+
+
+
+
+
+
   /* ================= UI ================= */
   return (
     <Layout search={search} setSearch={setSearch}>
@@ -153,6 +168,61 @@ function Notes() {
             ⭐ Saved Notes
           </button>
         </div>
+        {/* HERO STATS BAR */}
+        {/* ===== HERO STATS BAR (DYNAMIC) ===== */}
+        <div className="hero-stats">
+          <div className="stat-card">
+            <span className="stat-icon">📚</span>
+            <div>
+              <p className="stat-value">{notes.length}</p>
+              <p className="stat-label">Total Notes</p>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <span className="stat-icon">⭐</span>
+            <div>
+              <p className="stat-value">{bookmarks.length}</p>
+              <p className="stat-label">Saved</p>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <span className="stat-icon">🔥</span>
+            <div>
+              <p className="stat-value">
+                {notes.filter((n) => isNewNote(n.created_at)).length}
+              </p>
+              <p className="stat-label">New This Week</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        {/* ===== CATEGORY CHIPS (DYNAMIC) ===== */}
+        {subjects.length > 0 && (
+          <div className="category-chips">
+            <button
+              className={!subject ? "chip active" : "chip"}
+              onClick={() => setSubject("")}
+            >
+              All
+            </button>
+
+            {subjects.map((sub) => (
+              <button
+                key={sub.id}
+                className={Number(subject) === sub.id ? "chip active" : "chip"}
+                onClick={() => setSubject(sub.id)}
+              >
+                {sub.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+
 
         {/* ================= FILTER BAR ================= */}
         <div className="filters-bar">
@@ -238,12 +308,45 @@ function Notes() {
           </div>
         )}
 
+
+
+        {/* ================= TRENDING NOTES ================= */}
+        {!loading && trendingNotes.length > 0 && (
+          <div className="trending-section">
+            <h3>🔥 Trending Notes</h3>
+
+            <div className="trending-grid">
+              {trendingNotes.map((note) => (
+                <div key={note.id} className="trending-card">
+                  <h4>{note.title}</h4>
+
+                  <p className="trending-meta">
+                    {note.subject.name} • {note.subject.semester.name}
+                  </p>
+
+                  <div className="trending-actions">
+                    <span>⬇ {note.download_count || 0}</span>
+                    <button onClick={() => handleDownload(note)}>
+                      View
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
+
+
+
         {/* ================= NOTES GRID ================= */}
         <div className="notes-grid">
           {displayNotes.map((note) => (
             <div
               key={note.id}
               className="note-card"
+              onClick={() => handleView(note)}
               onTouchStart={onTouchStart}
               onTouchEnd={(e) => onTouchEnd(e, note)}
             >
@@ -251,27 +354,41 @@ function Notes() {
                 <span className="new-badge">NEW</span>
               )}
 
-              <div className="note-info">
+              {/* Card Header */}
+              <div className="note-header">
                 <h3>{note.title}</h3>
-                <span>
-                  {note.subject.semester.year.name} •{" "}
-                  {note.subject.semester.name}
-                </span>
-                <p>{note.subject.name}</p>
-              </div>
-
-              <iframe src={note.pdf_url} title={note.title} />
-
-              <div className="note-actions">
-                <button onClick={() => handleDownload(note)}>
-                  ⬇ Download ({note.download_count || 0})
-                </button>
-
-                <button onClick={() => toggleBookmark(note.id)}>
+                <button
+                  className="bookmark-btn"
+                  onClick={() => toggleBookmark(note.id)}
+                >
                   {bookmarks.includes(note.id) ? "⭐" : "☆"}
                 </button>
               </div>
+
+              {/* Meta Info */}
+              <p className="note-meta">
+                {note.subject.name} • {note.subject.semester.name}
+              </p>
+
+              {/* Preview */}
+              <iframe
+                src={note.pdf_url}
+                title={note.title}
+                loading="lazy"
+              />
+
+              {/* Actions */}
+              <div className="note-actions">
+                <button onClick={() => handleView(note)}>
+                  👁 View
+                </button>
+
+                <button onClick={() => handleDownload(note)}>
+                  ⬇ {note.download_count || 0}
+                </button>
+              </div>
             </div>
+
           ))}
         </div>
       </div>
