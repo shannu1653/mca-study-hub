@@ -93,41 +93,26 @@ TEMPLATES = [
 ]
 
 
-# ======================
-# DATABASE (LOCAL + RENDER SAFE)
-# ======================
-RENDER = os.getenv("RENDER") == "true"
+#
+RENDER = os.getenv("RENDER", "false").lower() == "true"
 
-if RENDER:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-            "OPTIONS": {
-                "ssl": {
-                    "ca": "/etc/secrets/ca.pem"
-                }
-            },
-        }
+DB_SSL_CA = os.getenv("DB_SSL_CA")
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
+        "OPTIONS": {
+            "ssl": {
+                "ca": DB_SSL_CA
+            }
+        } if RENDER else {},
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-        }
-    }
-
-
-
+}
 
 # ======================
 # PASSWORD VALIDATION
