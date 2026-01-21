@@ -1,14 +1,13 @@
 import axios from "axios";
 
 const api = axios.create({
-  // ✅ Use environment variable (works for local + Vercel)
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ✅ Attach JWT token automatically
+// Attach JWT automatically
 api.interceptors.request.use(
   (config) => {
     const token =
