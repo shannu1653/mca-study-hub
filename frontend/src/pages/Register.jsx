@@ -15,7 +15,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await api.post("auth/register/", {
+      const res = await api.post("/auth/register/", {
         email,
         password,
       });
@@ -25,14 +25,13 @@ function Register() {
       localStorage.setItem("is_admin", "false");
 
       toast.success("Account created 🎉");
-
       navigate("/notes", { replace: true });
-    } catch (error) {
-      const msg =
-        error.response?.data?.email?.[0] ||
-        error.response?.data?.password?.[0] ||
-        "Registration failed";
-      toast.error(msg);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.password?.[0] ||
+        "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -72,7 +71,9 @@ function Register() {
 
         <p className="auth-link">
           Already have an account?{" "}
-          <span onClick={() => navigate("/login")}>Login</span>
+          <span onClick={() => navigate("/login")}>
+            Login
+          </span>
         </p>
       </div>
     </div>

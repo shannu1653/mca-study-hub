@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ VERY IMPORTANT: clear old tokens
+  // ✅ VERY IMPORTANT
   useEffect(() => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
@@ -22,7 +22,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await api.post("auth/login/", {
+      const res = await api.post("/auth/login/", {
         email,
         password,
       });
@@ -39,7 +39,7 @@ function Login() {
       navigate(res.data.is_admin ? "/admin" : "/notes", {
         replace: true,
       });
-    } catch (error) {
+    } catch (err) {
       toast.error("Invalid email or password");
     } finally {
       setLoading(false);
@@ -72,12 +72,6 @@ function Login() {
             />
             <label>Password</label>
           </div>
-
-          <p className="auth-link">
-            <span onClick={() => navigate("/forgot-password")}>
-              Forgot password?
-            </span>
-          </p>
 
           <button type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Login"}

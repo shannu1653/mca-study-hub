@@ -7,18 +7,18 @@ const api = axios.create({
   },
 });
 
-// Attach JWT only for protected routes
+// Attach token ONLY for protected routes
 api.interceptors.request.use(
   (config) => {
-    const authFreeUrls = [
+    const authFree = [
       "/auth/login/",
       "/auth/register/",
       "/auth/forgot-password/",
       "/auth/reset-password/",
     ];
 
-    const isAuthFree = authFreeUrls.some((url) =>
-      config.url?.includes(url)
+    const isAuthFree = authFree.some((url) =>
+      config.url?.endsWith(url)
     );
 
     if (!isAuthFree) {
