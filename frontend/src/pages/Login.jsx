@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ VERY IMPORTANT: clear old tokens on page load
+  // ✅ VERY IMPORTANT: clear old tokens
   useEffect(() => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
@@ -27,7 +27,6 @@ function Login() {
         password,
       });
 
-      // ✅ Save fresh tokens
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem(

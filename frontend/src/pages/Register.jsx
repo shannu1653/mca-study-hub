@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
@@ -10,13 +10,6 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ VERY IMPORTANT: clear old tokens on page load
-  useEffect(() => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    localStorage.removeItem("is_admin");
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -27,22 +20,18 @@ function Register() {
         password,
       });
 
-      // ✅ Save tokens returned by backend
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
       localStorage.setItem("is_admin", "false");
 
       toast.success("Account created 🎉");
 
-      // ✅ Direct login after register
       navigate("/notes", { replace: true });
     } catch (error) {
       const msg =
         error.response?.data?.email?.[0] ||
         error.response?.data?.password?.[0] ||
-        error.response?.data?.detail ||
         "Registration failed";
-
       toast.error(msg);
     } finally {
       setLoading(false);
