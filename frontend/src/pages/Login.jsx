@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
@@ -10,17 +10,30 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ VERY IMPORTANT: clear old tokens on page load
+  useEffect(() => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("is_admin");
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await api.post("auth/login/", { email, password });
+      const res = await api.post("auth/login/", {
+        email,
+        password,
+      });
 
-      // ✅ FIX: correct token key
+      // ✅ Save fresh tokens
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
-      localStorage.setItem("is_admin", res.data.is_admin ? "true" : "false");
+      localStorage.setItem(
+        "is_admin",
+        res.data.is_admin ? "true" : "false"
+      );
 
       toast.success("Welcome back 👋");
 
