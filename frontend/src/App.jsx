@@ -3,58 +3,66 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Notes from "./pages/Notes";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
+import Layout from "./layout/Layout";
 
-/* Admin pages */
+/* User */
+import UserDashboard from "./pages/dashboard/UserDashboard";
+
+/* Admin */
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUpload from "./pages/admin/AdminUpload";
 import ManageYears from "./pages/admin/ManageYears";
 import ManageSemesters from "./pages/admin/ManageSemesters";
 import ManageSubjects from "./pages/admin/ManageSubjects";
 import ManageNotes from "./pages/admin/ManageNotes";
-import ForgotPassword from "./pages/ForgotPassword";
-import UserDashboard from "./pages/dashboard/UserDashboard";
-
 
 function App() {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("access");
   const isAdmin = localStorage.getItem("is_admin") === "true";
-  
 
   return (
     <Routes>
       {/* ================= PUBLIC ================= */}
       <Route
         path="/"
-        element={
-          token ? <Navigate to="/notes" replace /> : <Login />
-        }
+        element={token ? <Navigate to="/notes" replace /> : <Login />}
       />
 
       <Route
         path="/login"
-        element={
-          token ? <Navigate to="/notes" replace /> : <Login />
-        }
+        element={token ? <Navigate to="/notes" replace /> : <Login />}
       />
 
       <Route
         path="/register"
-        element={
-          token ? <Navigate to="/notes" replace /> : <Register />
-        }
+        element={token ? <Navigate to="/notes" replace /> : <Register />}
       />
+
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-
       {/* ================= USER ================= */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <UserDashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/notes"
         element={
           <ProtectedRoute>
-            <Notes />
+            <Layout>
+              <Notes />
+            </Layout>
           </ProtectedRoute>
         }
       />
@@ -64,7 +72,9 @@ function App() {
         path="/admin"
         element={
           <AdminRoute>
-            <AdminDashboard />
+            <Layout>
+              <AdminDashboard />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -73,7 +83,9 @@ function App() {
         path="/admin/upload"
         element={
           <AdminRoute>
-            <AdminUpload />
+            <Layout>
+              <AdminUpload />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -82,7 +94,9 @@ function App() {
         path="/admin/years"
         element={
           <AdminRoute>
-            <ManageYears />
+            <Layout>
+              <ManageYears />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -91,7 +105,9 @@ function App() {
         path="/admin/semesters"
         element={
           <AdminRoute>
-            <ManageSemesters />
+            <Layout>
+              <ManageSemesters />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -100,7 +116,9 @@ function App() {
         path="/admin/subjects"
         element={
           <AdminRoute>
-            <ManageSubjects />
+            <Layout>
+              <ManageSubjects />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -109,7 +127,9 @@ function App() {
         path="/admin/notes"
         element={
           <AdminRoute>
-            <ManageNotes />
+            <Layout>
+              <ManageNotes />
+            </Layout>
           </AdminRoute>
         }
       />
@@ -121,9 +141,7 @@ function App() {
           token ? <Navigate to="/notes" replace /> : <Navigate to="/login" replace />
         }
       />
-      <Route path="/dashboard" element={<UserDashboard />} />
     </Routes>
-    
   );
 }
 
