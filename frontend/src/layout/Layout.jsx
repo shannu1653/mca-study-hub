@@ -37,6 +37,9 @@ function Layout({ children, search, setSearch }) {
     navigate("/login", { replace: true });
   };
 
+  /* ACTIVE CHECK */
+  const isActive = (path) => location.pathname === path;
+
   return (
     <div className="layout">
       {/* ===== SIDEBAR (DESKTOP ONLY) ===== */}
@@ -44,13 +47,28 @@ function Layout({ children, search, setSearch }) {
         <h2>MCA Study</h2>
 
         <nav>
-          <Link to="/dashboard">📊 Dashboard</Link>
-          <Link to="/notes">📘 Notes</Link>
+          {!isAdmin && (
+            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""}>
+              📊 Dashboard
+            </Link>
+          )}
+
+          <Link to="/notes" className={isActive("/notes") ? "active" : ""}>
+            📘 Notes
+          </Link>
 
           {isAdmin && (
             <>
-              <Link to="/admin">🛠 Admin</Link>
-              <Link to="/admin/upload">⬆ Upload</Link>
+              <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
+                🛠 Admin
+              </Link>
+
+              <Link
+                to="/admin/upload"
+                className={isActive("/admin/upload") ? "active" : ""}
+              >
+                ⬆ Upload
+              </Link>
             </>
           )}
         </nav>
@@ -87,17 +105,19 @@ function Layout({ children, search, setSearch }) {
 
       {/* ===== 📱 MOBILE BOTTOM NAV ===== */}
       <nav className="bottom-nav mobile-only">
-        <Link
-          to="/dashboard"
-          className={location.pathname === "/dashboard" ? "active" : ""}
-        >
-          📊
-          <span>Dashboard</span>
-        </Link>
+        {!isAdmin && (
+          <Link
+            to="/dashboard"
+            className={isActive("/dashboard") ? "active" : ""}
+          >
+            📊
+            <span>Dashboard</span>
+          </Link>
+        )}
 
         <Link
           to="/notes"
-          className={location.pathname === "/notes" ? "active" : ""}
+          className={isActive("/notes") ? "active" : ""}
         >
           📘
           <span>Notes</span>
@@ -106,7 +126,7 @@ function Layout({ children, search, setSearch }) {
         {isAdmin && (
           <Link
             to="/admin"
-            className={location.pathname === "/admin" ? "active" : ""}
+            className={isActive("/admin") ? "active" : ""}
           >
             🛠
             <span>Admin</span>
