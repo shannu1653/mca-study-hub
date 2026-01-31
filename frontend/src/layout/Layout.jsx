@@ -41,7 +41,10 @@ function Layout({ children, search, setSearch }) {
   };
 
   /* ACTIVE LINK */
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) =>
+  location.pathname === path ||
+  location.pathname.startsWith(path + "/");
+
 
   return (
     <div className="layout">
@@ -51,14 +54,15 @@ function Layout({ children, search, setSearch }) {
 
         <nav>
           {/* 👤 USER DASHBOARD */}
-          {!isAdmin && (
-            <Link
-              to="/dashboard"
-              className={isActive("/dashboard") ? "active" : ""}
-            >
-              📊 Dashboard
-            </Link>
-          )}
+         {!isAdmin && (
+  <Link
+    to="/dashboard"
+    className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}
+  >
+    📊 Dashboard
+  </Link>
+)}
+
 
           {/* 📘 NOTES */}
           <Link
@@ -92,6 +96,12 @@ function Layout({ children, search, setSearch }) {
       {/* ================= MAIN ================= */}
       <main className="main">
         <header className="topbar">
+          {!isAdmin && location.pathname === "/notes" && (
+  <Link to="/dashboard" className="dashboard-quick-btn">
+    📊 Go to Dashboard
+  </Link>
+)}
+
           {setSearch && (
             <input
               placeholder="Search notes..."
@@ -158,3 +168,4 @@ function Layout({ children, search, setSearch }) {
 }
 
 export default Layout;
+ 

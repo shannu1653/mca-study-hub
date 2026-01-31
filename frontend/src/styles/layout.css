@@ -227,3 +227,11 @@ body.dark,
     padding-bottom: 90px;
   }
 }
+.dashboard-quick-btn {
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}

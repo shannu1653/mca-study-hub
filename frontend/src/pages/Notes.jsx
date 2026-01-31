@@ -108,16 +108,47 @@ function Notes() {
   };
 
   /* ================= DOWNLOAD ================= */
-  const handleDownload = async (note) => {
-    try {
-      await api.post(`notes/${note.id}/download/`);
-    } catch {}
-    window.open(note.pdf_url, "_blank", "noopener,noreferrer");
-  };
+ const handleView = async (note) => {
+  try {
+    const token = localStorage.getItem("access");
 
-  const handleView = (note) => {
-    window.open(note.pdf_url, "_blank", "noopener,noreferrer");
-  };
+    const res = await api.get(`notes/${note.id}/view/`, {
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const fileURL = URL.createObjectURL(
+      new Blob([res.data], { type: "application/pdf" })
+    );
+
+    window.open(fileURL);
+  } catch {
+    alert("Unable to open PDF");
+  }
+};
+
+const handleDownload = async (note) => {
+  try {
+    const token = localStorage.getItem("access");
+
+    const res = await api.get(`notes/${note.id}/download/`, {
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const url = URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${note.title}.pdf`;
+    link.click();
+  } catch {
+    alert("Download failed");
+  }
+};
 
   /* ================= SWIPE ================= */
   const touchStartX = useRef(0);
@@ -148,11 +179,6 @@ function Notes() {
           <h2>Notes</h2>
           <p>Browse and download MCA study materials</p>
         </div>
-
-        {/* ✅ DASHBOARD BUTTON */}
-        <Link to="/dashboard" className="dashboard-btn">
-          📊 Dashboard
-        </Link>
       </div>
 
       {/* ===== HERO STATS ===== */}
@@ -341,18 +367,17 @@ function Notes() {
               {note.subject.name} • {note.subject.semester.name}
             </p>
 
-            <iframe
-              src={note.pdf_url}
-              title={note.title}
-              loading="lazy"
-            />
+           <div className="pdf-preview">
+  📄 PDF Preview
+</div>
 
             <div className="note-actions">
-              <button onClick={() => handleView(note)}>👁 View</button>
-              <button onClick={() => handleDownload(note)}>
-                ⬇ {note.download_count || 0}
-              </button>
-            </div>
+  <button onClick={() => handleView(note)}>👁 View</button>
+  <button onClick={() => handleDownload(note)}>
+    ⬇ {note.download_count || 0}
+  </button>
+</div>
+
           </div>
         ))}
       </div>
