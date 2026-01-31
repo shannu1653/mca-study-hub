@@ -15,6 +15,7 @@ import ManageSemesters from "./pages/admin/ManageSemesters";
 import ManageSubjects from "./pages/admin/ManageSubjects";
 import ManageNotes from "./pages/admin/ManageNotes";
 import ForgotPassword from "./pages/ForgotPassword";
+import UserDashboard from "./pages/dashboard/UserDashboard";
 
 
 function App() {
@@ -120,7 +121,9 @@ function App() {
           token ? <Navigate to="/notes" replace /> : <Navigate to="/login" replace />
         }
       />
+      <Route path="/dashboard" element={<UserDashboard />} />
     </Routes>
+    
   );
 }
 

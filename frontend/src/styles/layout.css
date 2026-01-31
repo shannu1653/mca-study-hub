@@ -8,11 +8,10 @@
 html, body {
   width: 100%;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
-
-
-
+/* ===== THEME VARIABLES ===== */
 :root {
   --bg: #f5f7fb;
   --text: #222;
@@ -20,7 +19,8 @@ html, body {
   --accent: #2563eb;
 }
 
-body.dark {
+body.dark,
+[data-theme="dark"] {
   --bg: #0f172a;
   --text: #e5e7eb;
   --card: #1e293b;
@@ -33,6 +33,7 @@ body.dark {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
+  animation: fadeIn 0.35s ease;
 }
 
 /* ================= SIDEBAR ================= */
@@ -41,6 +42,7 @@ body.dark {
   background: var(--card);
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  animation: slideInLeft 0.35s ease;
 }
 
 .sidebar h2 {
@@ -54,12 +56,13 @@ body.dark {
   text-decoration: none;
   color: var(--text);
   border-radius: 6px;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease, transform 0.2s ease;
 }
 
 .sidebar nav a:hover {
   background: var(--accent);
   color: white;
+  transform: translateX(4px);
 }
 
 /* ================= MAIN ================= */
@@ -74,6 +77,7 @@ body.dark {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  animation: fadeUp 0.4s ease;
 }
 
 .topbar input {
@@ -99,17 +103,18 @@ body.dark {
   padding: 6px 12px;
   border-radius: 999px;
   font-weight: 600;
+  animation: fadeUp 0.4s ease;
 }
 
 .saved-pill span {
-  background: #2563eb;
+  background: var(--accent);
   color: white;
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 999px;
 }
 
-/* ================= DARK MODE BUTTON ================= */
+/* ================= BUTTONS ================= */
 .top-actions button {
   padding: 8px 14px;
   border-radius: 8px;
@@ -119,19 +124,15 @@ body.dark {
 }
 
 .top-actions button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
 }
 
 /* ================= LOGOUT ================= */
-.logout-wrapper {
-  position: relative;
-}
-
 .logout-btn {
   background: #ef4444;
   color: white;
-  min-width: 96px;      /* 🔥 prevents jumping */
+  min-width: 96px;
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
@@ -141,109 +142,50 @@ body.dark {
 
 .logout-btn:hover {
   background: #dc2626;
-}
-
-/* ================= 🌟 NEW BADGE ================= */
-.new-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ff3b30;
-  color: white;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 999px;
-  animation: glowPulse 1.6s infinite;
-  pointer-events: none;
+  transform: translateY(-1px);
 }
 
 /* ================= GLOW ANIMATION ================= */
 @keyframes glowPulse {
   0% {
     box-shadow: 0 0 0 rgba(255, 59, 48, 0.6);
-    transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 12px rgba(255, 59, 48, 0.9);
-    transform: scale(1.1);
+    box-shadow: 0 0 14px rgba(255, 59, 48, 0.9);
   }
   100% {
     box-shadow: 0 0 0 rgba(255, 59, 48, 0.6);
-    transform: scale(1);
   }
 }
 
+/* ================= PAGE ANIMATIONS ================= */
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
 
-/* ===== MOBILE VIEW ===== */
-@media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  .sidebar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-  }
-
-  .sidebar h2 {
-    font-size: 18px;
-    margin: 0;
-  }
-
-  .sidebar nav {
-    display: flex;
-    gap: 12px;
-  }
-
-  .sidebar nav a {
-    padding: 6px 10px;
-    font-size: 14px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
-@media (max-width: 768px) {
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
 
-  .topbar input {
-    width: 100%;
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
   }
-
-  .top-actions {
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
-@media (max-width: 768px) {
-  button {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
 
-  .logout-btn {
-    width: 100%;
-  }
-}
-@media (max-width: 480px) {
-  .sidebar nav {
-    gap: 6px;
-  }
-
-  .sidebar nav a {
-    font-size: 13px;
-  }
-
-  .saved-pill {
-    font-size: 13px;
-    padding: 4px 8px;
-  }
-}
 /* ===== VISIBILITY HELPERS ===== */
 .desktop-only {
   display: block;
@@ -253,8 +195,12 @@ body.dark {
   display: none;
 }
 
-/* ===== MOBILE BOTTOM NAV ===== */
+/* ================= 📱 MOBILE VIEW ================= */
 @media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
   .desktop-only {
     display: none;
   }
@@ -263,6 +209,16 @@ body.dark {
     display: flex;
   }
 
+  .topbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .topbar input {
+    width: 100%;
+  }
+
+  /* ===== MOBILE BOTTOM NAV ===== */
   .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -270,11 +226,12 @@ body.dark {
     right: 0;
     height: 64px;
     background: var(--card);
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid rgba(255,255,255,0.08);
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
+    animation: slideUp 0.35s ease;
   }
 
   .bottom-nav a,
@@ -288,6 +245,12 @@ body.dark {
     color: var(--text);
     text-decoration: none;
     cursor: pointer;
+    transition: transform 0.15s ease, color 0.2s ease;
+  }
+
+  .bottom-nav a:active,
+  .bottom-nav button:active {
+    transform: scale(0.92);
   }
 
   .bottom-nav span {
@@ -301,6 +264,16 @@ body.dark {
 
   /* prevent content hidden behind nav */
   .main {
-    padding-bottom: 80px;
+    padding-bottom: 90px;
+  }
+}
+
+/* ===== BOTTOM NAV ANIMATION ===== */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }

@@ -2,3 +2,20 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
+/* LIGHT THEME */
+:root {
+  --bg-color: #f8fafc;
+  --card-color: #ffffff;
+  --text-color: #0f172a;
+  --muted-text: #64748b;
+  --chart-bg: #f1f5f9;
+}
+
+/* DARK THEME */
+[data-theme="dark"] {
+  --bg-color: #0f172a;
+  --card-color: #020617;
+  --text-color: #e5e7eb;
+  --muted-text: #94a3b8;
+  --chart-bg: #020617;
+}

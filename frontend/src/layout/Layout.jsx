@@ -16,11 +16,16 @@ function Layout({ children, search, setSearch }) {
   /* ⭐ Saved Count */
   const [savedCount, setSavedCount] = useState(0);
 
+  /* APPLY THEME */
   useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
+    document.documentElement.setAttribute(
+      "data-theme",
+      darkMode ? "dark" : "light"
+    );
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
+  /* LOAD SAVED */
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("bookmarks")) || [];
     setSavedCount(saved.length);
@@ -39,6 +44,7 @@ function Layout({ children, search, setSearch }) {
         <h2>MCA Study</h2>
 
         <nav>
+          <Link to="/dashboard">📊 Dashboard</Link>
           <Link to="/notes">📘 Notes</Link>
 
           {isAdmin && (
@@ -82,6 +88,14 @@ function Layout({ children, search, setSearch }) {
       {/* ===== 📱 MOBILE BOTTOM NAV ===== */}
       <nav className="bottom-nav mobile-only">
         <Link
+          to="/dashboard"
+          className={location.pathname === "/dashboard" ? "active" : ""}
+        >
+          📊
+          <span>Dashboard</span>
+        </Link>
+
+        <Link
           to="/notes"
           className={location.pathname === "/notes" ? "active" : ""}
         >
@@ -96,18 +110,6 @@ function Layout({ children, search, setSearch }) {
           >
             🛠
             <span>Admin</span>
-          </Link>
-        )}
-
-        {isAdmin && (
-          <Link
-            to="/admin/upload"
-            className={
-              location.pathname === "/admin/upload" ? "active" : ""
-            }
-          >
-            ⬆
-            <span>Upload</span>
           </Link>
         )}
 
