@@ -49,9 +49,13 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Layout>
-              <UserDashboard />
-            </Layout>
+            {!isAdmin ? (
+              <Layout>
+                <UserDashboard />
+              </Layout>
+            ) : (
+              <Navigate to="/admin" replace />
+            )}
           </ProtectedRoute>
         }
       />
