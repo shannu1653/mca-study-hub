@@ -53,50 +53,57 @@ function Layout({ children, search, setSearch }) {
         <h2>MCA Study</h2>
 
         <nav>
-          {/* 👤 USER DASHBOARD */}
-         {!isAdmin && (
+  {!isAdmin && (
+    <>
+      <p className="nav-section">User</p>
+
+      <Link
+        to="/dashboard"
+        className={`nav-link dashboard-link ${
+          isActive("/dashboard") ? "active" : ""
+        }`}
+      >
+        📊 Dashboard
+      </Link>
+    </>
+  )}
+
+  <p className="nav-section">Study</p>
+
   <Link
-    to="/dashboard"
-    className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}
+    to="/notes"
+    className={isActive("/notes") ? "active" : ""}
   >
-    📊 Dashboard
+    📘 Notes
   </Link>
-)}
 
+  {isAdmin && (
+    <>
+      <p className="nav-section">Admin</p>
 
-          {/* 📘 NOTES */}
-          <Link
-            to="/notes"
-            className={isActive("/notes") ? "active" : ""}
-          >
-            📘 Notes
-          </Link>
+      <Link
+        to="/admin"
+        className={isActive("/admin") ? "active" : ""}
+      >
+        🛠 Admin Dashboard
+      </Link>
 
-          {/* 🛠 ADMIN */}
-          {isAdmin && (
-            <>
-              <Link
-                to="/admin"
-                className={isActive("/admin") ? "active" : ""}
-              >
-                🛠 Admin Dashboard
-              </Link>
+      <Link
+        to="/admin/upload"
+        className={isActive("/admin/upload") ? "active" : ""}
+      >
+        ⬆ Upload Notes
+      </Link>
+    </>
+  )}
+</nav>
 
-              <Link
-                to="/admin/upload"
-                className={isActive("/admin/upload") ? "active" : ""}
-              >
-                ⬆ Upload Notes
-              </Link>
-            </>
-          )}
-        </nav>
       </aside>
 
       {/* ================= MAIN ================= */}
       <main className="main">
         <header className="topbar">
-          {!isAdmin && location.pathname === "/notes" && (
+          {!isAdmin && location.pathname.startsWith("/notes") && (
   <Link to="/dashboard" className="dashboard-quick-btn">
     📊 Go to Dashboard
   </Link>
@@ -132,12 +139,14 @@ function Layout({ children, search, setSearch }) {
       <nav className="bottom-nav mobile-only">
         {!isAdmin && (
           <Link
-            to="/dashboard"
-            className={isActive("/dashboard") ? "active" : ""}
-          >
-            📊
-            <span>Dashboard</span>
-          </Link>
+  to="/dashboard"
+  className={`nav-link dashboard-link ${
+    isActive("/dashboard") ? "active" : ""
+  }`}
+>
+  📊 Dashboard
+</Link>
+
         )}
 
         <Link
