@@ -52,23 +52,15 @@ function Layout({ children, search, setSearch }) {
       <aside className="sidebar desktop-only">
         <h2>MCA Study</h2>
 
-        <nav>
+<nav>
   {!isAdmin && (
-    <>
-      <p className="nav-section">User</p>
-
-      <Link
-        to="/dashboard"
-        className={`nav-link dashboard-link ${
-          isActive("/dashboard") ? "active" : ""
-        }`}
-      >
-        📊 Dashboard
-      </Link>
-    </>
+    <Link
+      to="/dashboard"
+      className={isActive("/dashboard") ? "active" : ""}
+    >
+      📊 Dashboard
+    </Link>
   )}
-
-  <p className="nav-section">Study</p>
 
   <Link
     to="/notes"
@@ -79,12 +71,7 @@ function Layout({ children, search, setSearch }) {
 
   {isAdmin && (
     <>
-      <p className="nav-section">Admin</p>
-
-      <Link
-        to="/admin"
-        className={isActive("/admin") ? "active" : ""}
-      >
+      <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
         🛠 Admin Dashboard
       </Link>
 
@@ -97,6 +84,7 @@ function Layout({ children, search, setSearch }) {
     </>
   )}
 </nav>
+
 
       </aside>
 

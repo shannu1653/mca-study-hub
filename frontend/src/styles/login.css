@@ -220,3 +220,11 @@ body.dark .login-card {
 body.dark .input-group label {
   background: rgba(2, 6, 23, 0.9);
 }
+.sidebar {
+  min-height: 100vh; /* 🔥 THIS FIXES IT */
+}
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
