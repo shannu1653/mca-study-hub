@@ -6,14 +6,17 @@ function Layout({ children, search, setSearch }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isAdmin = localStorage.getItem("is_admin") === "true";
+  /* ✅ ROLE CHECK (SAFE) */
+  const isAdmin =
+    localStorage.getItem("is_admin") === "true" ||
+    localStorage.getItem("is_admin") === "True";
 
-  /* 🌙 Dark Mode */
+  /* 🌙 DARK MODE */
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
 
-  /* ⭐ Saved Count */
+  /* ⭐ SAVED COUNT */
   const [savedCount, setSavedCount] = useState(0);
 
   /* APPLY THEME */
@@ -31,50 +34,62 @@ function Layout({ children, search, setSearch }) {
     setSavedCount(saved.length);
   }, []);
 
+  /* LOGOUT */
   const logout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("is_admin");
+    localStorage.clear();
     navigate("/login", { replace: true });
   };
 
-  /* ACTIVE CHECK */
+  /* ACTIVE LINK */
   const isActive = (path) => location.pathname === path;
 
   return (
     <div className="layout">
-      {/* ===== SIDEBAR (DESKTOP ONLY) ===== */}
+      {/* ================= SIDEBAR ================= */}
       <aside className="sidebar desktop-only">
         <h2>MCA Study</h2>
 
         <nav>
+          {/* 👤 USER DASHBOARD */}
           {!isAdmin && (
-            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""}>
+            <Link
+              to="/dashboard"
+              className={isActive("/dashboard") ? "active" : ""}
+            >
               📊 Dashboard
             </Link>
           )}
 
-          <Link to="/notes" className={isActive("/notes") ? "active" : ""}>
+          {/* 📘 NOTES */}
+          <Link
+            to="/notes"
+            className={isActive("/notes") ? "active" : ""}
+          >
             📘 Notes
           </Link>
 
+          {/* 🛠 ADMIN */}
           {isAdmin && (
             <>
-              <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
-                🛠 Admin
+              <Link
+                to="/admin"
+                className={isActive("/admin") ? "active" : ""}
+              >
+                🛠 Admin Dashboard
               </Link>
 
               <Link
                 to="/admin/upload"
                 className={isActive("/admin/upload") ? "active" : ""}
               >
-                ⬆ Upload
+                ⬆ Upload Notes
               </Link>
             </>
           )}
         </nav>
       </aside>
 
-      {/* ===== MAIN ===== */}
+      {/* ================= MAIN ================= */}
       <main className="main">
         <header className="topbar">
           {setSearch && (
@@ -103,7 +118,7 @@ function Layout({ children, search, setSearch }) {
         <div className="content">{children}</div>
       </main>
 
-      {/* ===== 📱 MOBILE BOTTOM NAV ===== */}
+      {/* ================= 📱 MOBILE NAV ================= */}
       <nav className="bottom-nav mobile-only">
         {!isAdmin && (
           <Link
