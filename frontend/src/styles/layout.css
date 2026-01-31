@@ -37,7 +37,7 @@ body.dark,
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  width: 240px;
+  width: 100vh !important;
   background: var(--card);
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
@@ -52,7 +52,9 @@ body.dark,
 .sidebar nav {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
+
 .sidebar nav a:not(.active):not(.dashboard-link) {
   opacity: 0.85;
 }

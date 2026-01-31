@@ -126,14 +126,14 @@ function Layout({ children, search, setSearch }) {
       {/* ================= 📱 MOBILE NAV ================= */}
       <nav className="bottom-nav mobile-only">
         {!isAdmin && (
-          <Link
+    <Link
   to="/dashboard"
-  className={`nav-link dashboard-link ${
-    isActive("/dashboard") ? "active" : ""
-  }`}
+  className={isActive("/dashboard") ? "active" : ""}
 >
-  📊 Dashboard
+  📊
+  <span>Dashboard</span>
 </Link>
+
 
         )}
 
