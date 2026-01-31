@@ -7,9 +7,7 @@ function Layout({ children, search, setSearch }) {
   const location = useLocation();
 
   /* ✅ ROLE CHECK (SAFE) */
-  const isAdmin =
-    localStorage.getItem("is_admin") === "true" ||
-    localStorage.getItem("is_admin") === "True";
+    const isAdmin = localStorage.getItem("is_admin") === "true";
 
   /* 🌙 DARK MODE */
   const [darkMode, setDarkMode] = useState(
