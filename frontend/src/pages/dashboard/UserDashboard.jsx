@@ -1,7 +1,7 @@
 // src/pages/dashboard/UserDashboard.jsx
 import { useEffect, useState } from "react";
 import "../../styles/dashboard.css";
-import StatCard from "../../components/dashboard/StatCard";
+import StatCard from "../../components/StatCard";
 import NotesChartBox from "../../components/dashboard/NotesChartBox";
 import SubjectChartBox from "../../components/dashboard/SubjectChartBox";
 import { getUserDashboardStats } from "../../api/dashboardApi";
