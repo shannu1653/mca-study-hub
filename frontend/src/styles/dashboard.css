@@ -1,42 +1,67 @@
 /* ===============================
-   USER DASHBOARD (MOBILE FIRST)
+   USER DASHBOARD (PREMIUM)
 ================================ */
 
 .user-dashboard {
-  padding: 16px;
-  padding-bottom: 80px; /* bottom nav safe */
-  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: 90px;
   background: var(--bg-color);
   color: var(--text-color);
   animation: fadeUp 0.4s ease;
 }
 
-/* ===== TITLE ===== */
-.dashboard-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
+/* ===============================
+   HEADER
+================================ */
+
+.dashboard-header {
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.dashboard-header p {
+  font-size: 14px;
+  color: var(--muted-text);
 }
 
 /* ===============================
    STATS GRID
 ================================ */
 
-/* Mobile */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 26px;
 }
 
-/* Card */
+/* Stat Card */
 .stat-card {
+  position: relative;
   background: var(--card-color);
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Accent bar */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    var(--accent),
+    rgba(59, 130, 246, 0.5)
+  );
 }
 
 .stat-title {
@@ -45,8 +70,8 @@
 }
 
 .stat-value {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
   margin-top: 6px;
 }
 
@@ -58,73 +83,121 @@
 }
 
 /* ===============================
-   CHARTS GRID
+   SECTIONS
 ================================ */
 
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+.dashboard-section {
+  margin-bottom: 28px;
 }
 
-/* Chart Card */
-.chart-card {
+.dashboard-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* ===============================
+   QUICK ACTIONS
+================================ */
+
+.quick-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    #2563eb
+  );
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quick-actions button:active {
+  transform: scale(0.97);
+}
+
+/* ===============================
+   PROGRESS CARDS
+================================ */
+
+.progress-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.progress-card {
   background: var(--card-color);
   padding: 16px;
   border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.chart-title {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  color: var(--muted-text);
-}
-
-/* Chart Area */
-.chart-placeholder,
-.chart-wrapper {
-  height: 220px;
-  border-radius: 10px;
-  background: var(--chart-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.progress-card span {
+  display: block;
   font-size: 13px;
   color: var(--muted-text);
 }
 
-/* Desktop charts */
-@media (min-width: 768px) {
-  .charts-grid {
-    grid-template-columns: 2fr 1fr;
-  }
-
-  .chart-placeholder,
-  .chart-wrapper {
-    height: 260px;
-  }
+.progress-card strong {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 6px;
+  display: block;
 }
 
 /* ===============================
-   INTERACTIONS
+   CTA
 ================================ */
 
-/* Hover only for mouse devices */
-@media (hover: hover) {
-  .stat-card:hover,
-  .chart-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-  }
+.dashboard-cta {
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    #1d4ed8
+  );
+  color: white;
+  padding: 22px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.35);
 }
 
-/* Tap feedback (mobile) */
-.stat-card:active,
-.chart-card:active {
-  transform: scale(0.98);
+.dashboard-cta h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.dashboard-cta p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 14px;
+}
+
+.dashboard-cta button {
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: none;
+  background: white;
+  color: #1d4ed8;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-cta button:active {
+  transform: scale(0.95);
 }
 
 /* ===============================
@@ -133,46 +206,43 @@
 
 .state-box {
   background: var(--card-color);
-  padding: 24px;
-  border-radius: 16px;
+  padding: 26px;
+  border-radius: 18px;
   text-align: center;
   animation: fadeUp 0.35s ease;
 }
 
 .state-icon {
-  font-size: 40px;
+  font-size: 42px;
   margin-bottom: 12px;
-}
-
-.state-box h3 {
-  margin-bottom: 6px;
 }
 
 .state-box p {
   font-size: 14px;
-  opacity: 0.8;
-}
-
-.state-action {
-  margin-top: 16px;
+  opacity: 0.85;
 }
 
 .retry-btn {
-  margin-top: 12px;
-  padding: 10px 16px;
-  border-radius: 10px;
+  margin-top: 14px;
+  padding: 10px 18px;
+  border-radius: 12px;
   border: none;
   background: var(--accent);
   color: white;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.retry-btn:active {
-  transform: scale(0.95);
-}
+/* ===============================
+   INTERACTIONS
+================================ */
 
-.state-box.error {
-  border: 1px solid rgba(239, 68, 68, 0.3);
+@media (hover: hover) {
+  .stat-card:hover,
+  .progress-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.14);
+  }
 }
 
 /* ===============================
@@ -182,18 +252,10 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.fade-item {
-  animation: fadeUp 0.4s ease;
-}
-.user-dashboard {
-  min-height: auto;   /* not full page */
-  padding-bottom: 24px;
 }
