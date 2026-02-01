@@ -11,6 +11,7 @@ import Layout from "./layout/Layout";
 /* USER */
 import Home from "./pages/Home";
 import Notes from "./pages/Notes";
+import UserDashboard from "./pages/dashboard/UserDashboard";
 
 /* ADMIN */
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -44,99 +45,34 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* ================= USER ================= */}
+      {/* ================= USER (LAYOUT ONCE) ================= */}
       <Route
-        path="/home"
         element={
           <ProtectedRoute>
-            {!isAdmin ? (
-              <Layout>
-                <Home />
-              </Layout>
-            ) : (
-              <Navigate to="/admin" replace />
-            )}
+            {!isAdmin ? <Layout /> : <Navigate to="/admin" replace />}
           </ProtectedRoute>
         }
-      />
-
-      <Route
-        path="/notes"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Notes />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="/home" element={<Home />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/notes" element={<Notes />} />
+      </Route>
 
       {/* ================= ADMIN ================= */}
       <Route
-        path="/admin"
         element={
           <AdminRoute>
-            <Layout>
-              <AdminDashboard />
-            </Layout>
+            <Layout />
           </AdminRoute>
         }
-      />
-
-      <Route
-        path="/admin/upload"
-        element={
-          <AdminRoute>
-            <Layout>
-              <AdminUpload />
-            </Layout>
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/admin/years"
-        element={
-          <AdminRoute>
-            <Layout>
-              <ManageYears />
-            </Layout>
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/admin/semesters"
-        element={
-          <AdminRoute>
-            <Layout>
-              <ManageSemesters />
-            </Layout>
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/admin/subjects"
-        element={
-          <AdminRoute>
-            <Layout>
-              <ManageSubjects />
-            </Layout>
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/admin/notes"
-        element={
-          <AdminRoute>
-            <Layout>
-              <ManageNotes />
-            </Layout>
-          </AdminRoute>
-        }
-      />
+      >
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/upload" element={<AdminUpload />} />
+        <Route path="/admin/years" element={<ManageYears />} />
+        <Route path="/admin/semesters" element={<ManageSemesters />} />
+        <Route path="/admin/subjects" element={<ManageSubjects />} />
+        <Route path="/admin/notes" element={<ManageNotes />} />
+      </Route>
 
       {/* ================= FALLBACK ================= */}
       <Route
