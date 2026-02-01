@@ -256,3 +256,37 @@ body.dark,
     padding-bottom: 90px;
   }
 }
+/* ================= MOBILE HEADER ================= */
+.mobile-header {
+  height: 56px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.mobile-header .app-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.mobile-header .page-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mobile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.mobile-actions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+}
