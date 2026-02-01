@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import "../styles/layout.css";
 
-function Layout({ children, search, setSearch }) {
+function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  /* ✅ ROLE CHECK (SAFE) */
-    const isAdmin = localStorage.getItem("is_admin") === "true";
+  /* ✅ ROLE CHECK */
+  const isAdmin = localStorage.getItem("is_admin") === "true";
 
   /* 🌙 DARK MODE */
   const [darkMode, setDarkMode] = useState(
@@ -26,11 +26,11 @@ function Layout({ children, search, setSearch }) {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  /* LOAD SAVED */
+  /* LOAD SAVED COUNT */
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("bookmarks")) || [];
     setSavedCount(saved.length);
-  }, []);
+  }, [location.pathname]);
 
   /* LOGOUT */
   const logout = () => {
@@ -40,67 +40,59 @@ function Layout({ children, search, setSearch }) {
 
   /* ACTIVE LINK */
   const isActive = (path) =>
-  location.pathname === path ||
-  location.pathname.startsWith(path + "/");
-
+    location.pathname === path ||
+    location.pathname.startsWith(path + "/");
 
   return (
     <div className="layout">
       {/* ================= SIDEBAR ================= */}
       <aside className="sidebar desktop-only">
-        <h2>MCA Study</h2>
+        <h2 className="logo">MCA Study</h2>
 
-<nav>
-  {!isAdmin && (
-    <Link
-      to="/dashboard"
-      className={isActive("/dashboard") ? "active" : ""}
-    >
-      📊 Dashboard
-    </Link>
-  )}
+        <nav>
+          {!isAdmin && (
+            <Link
+              to="/dashboard"
+              className={isActive("/dashboard") ? "active" : ""}
+            >
+              📊 Dashboard
+            </Link>
+          )}
 
-  <Link
-    to="/notes"
-    className={isActive("/notes") ? "active" : ""}
-  >
-    📘 Notes
-  </Link>
+          <Link
+            to="/notes"
+            className={isActive("/notes") ? "active" : ""}
+          >
+            📘 Notes
+          </Link>
 
-  {isAdmin && (
-    <>
-      <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
-        🛠 Admin Dashboard
-      </Link>
+          {isAdmin && (
+            <>
+              <Link
+                to="/admin"
+                className={isActive("/admin") ? "active" : ""}
+              >
+                🛠 Admin
+              </Link>
 
-      <Link
-        to="/admin/upload"
-        className={isActive("/admin/upload") ? "active" : ""}
-      >
-        ⬆ Upload Notes
-      </Link>
-    </>
-  )}
-</nav>
-
-
+              <Link
+                to="/admin/upload"
+                className={isActive("/admin/upload") ? "active" : ""}
+              >
+                ⬆ Upload
+              </Link>
+            </>
+          )}
+        </nav>
       </aside>
 
       {/* ================= MAIN ================= */}
       <main className="main">
         <header className="topbar">
           {!isAdmin && location.pathname.startsWith("/notes") && (
-  <Link to="/dashboard" className="dashboard-quick-btn">
-    📊 Go to Dashboard
-  </Link>
-)}
-
-          {setSearch && (
-            <input
-              placeholder="Search notes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <Link to="/dashboard" className="dashboard-quick-btn">
+              📊 Go to Dashboard
+            </Link>
           )}
 
           <div className="top-actions">
@@ -118,21 +110,22 @@ function Layout({ children, search, setSearch }) {
           </div>
         </header>
 
-        <div className="content">{children}</div>
+        {/* ✅ THIS IS THE MOST IMPORTANT LINE */}
+        <div className="content">
+          <Outlet />
+        </div>
       </main>
 
-      {/* ================= 📱 MOBILE NAV ================= */}
+      {/* ================= MOBILE NAV ================= */}
       <nav className="bottom-nav mobile-only">
         {!isAdmin && (
-    <Link
-  to="/dashboard"
-  className={isActive("/dashboard") ? "active" : ""}
->
-  📊
-  <span>Dashboard</span>
-</Link>
-
-
+          <Link
+            to="/dashboard"
+            className={isActive("/dashboard") ? "active" : ""}
+          >
+            📊
+            <span>Dashboard</span>
+          </Link>
         )}
 
         <Link
@@ -163,4 +156,3 @@ function Layout({ children, search, setSearch }) {
 }
 
 export default Layout;
- 

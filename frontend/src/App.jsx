@@ -45,7 +45,7 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* ================= USER (LAYOUT ONCE) ================= */}
+      {/* ================= USER ================= */}
       <Route
         element={
           <ProtectedRoute>
