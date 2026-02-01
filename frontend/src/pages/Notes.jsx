@@ -2,14 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
-/* ================= UTIL ================= */
+/* ================= HELPER ================= */
 const isNewNote = (createdAt) => {
-  const created = new Date(createdAt);
+  const noteDate = new Date(createdAt);
   const now = new Date();
-  return (now - created) / (1000 * 60 * 60 * 24) <= 7;
+  return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
 };
 
-function Notes() {
+export default function Notes() {
   /* ================= STATE ================= */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
@@ -27,27 +27,22 @@ function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH INITIAL ================= */
+  /* ================= FETCH NOTES + YEARS ================= */
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [notesRes, yearsRes] = await Promise.all([
-          api.get("notes/"),
-          api.get("notes/years/"),
-        ]);
-
+    Promise.all([
+      api.get("notes/"),
+      api.get("notes/years/"),
+    ])
+      .then(([notesRes, yearsRes]) => {
         setNotes(notesRes.data || []);
         setYears(yearsRes.data || []);
-      } catch (err) {
-        console.error(err);
+      })
+      .catch(() => {
+        alert("Session expired. Please login again.");
         localStorage.clear();
         window.location.href = "/login";
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   /* ================= SEMESTERS ================= */
@@ -55,8 +50,6 @@ function Notes() {
     if (!year) {
       setSemesters([]);
       setSemester("");
-      setSubjects([]);
-      setSubject("");
       return;
     }
 
@@ -81,14 +74,12 @@ function Notes() {
   }, [semester]);
 
   /* ================= FILTER ================= */
-  const filteredNotes = notes.filter((n) => {
-    return (
-      n.title.toLowerCase().includes(search.toLowerCase()) &&
-      (!year || n.subject.semester.year.id === Number(year)) &&
-      (!semester || n.subject.semester.id === Number(semester)) &&
-      (!subject || n.subject.id === Number(subject))
-    );
-  });
+  const filteredNotes = notes.filter((n) =>
+    n.title.toLowerCase().includes(search.toLowerCase()) &&
+    (!year || n.subject.semester.year.id === Number(year)) &&
+    (!semester || n.subject.semester.id === Number(semester)) &&
+    (!subject || n.subject.id === Number(subject))
+  );
 
   const displayNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
@@ -104,24 +95,17 @@ function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW ================= */
+  /* ================= VIEW PDF (FIXED) ================= */
   const handleView = (note) => {
     if (!note.file) {
       alert("PDF not available");
       return;
     }
-    window.open(note.file, "_blank", "noopener,noreferrer");
+    window.open(note.file, "_blank");
   };
 
-  /* ================= DOWNLOAD ================= */
-  const handleDownload = async (note) => {
-    try {
-      // 🔥 increase download count (POST only)
-      await api.post(`notes/notes/${note.id}/download/`);
-    } catch (e) {
-      console.warn("Download count update failed");
-    }
-
+  /* ================= DOWNLOAD PDF (FIXED) ================= */
+  const handleDownload = (note) => {
     if (!note.file) {
       alert("PDF not available");
       return;
@@ -134,13 +118,9 @@ function Notes() {
     link.click();
   };
 
-  /* ================= SWIPE (MOBILE) ================= */
+  /* ================= SWIPE SUPPORT ================= */
   const touchStartX = useRef(0);
-
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
+  const onTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
   const onTouchEnd = (e, note) => {
     const diff = e.changedTouches[0].clientX - touchStartX.current;
     if (diff > 80) handleDownload(note);
@@ -149,21 +129,16 @@ function Notes() {
 
   /* ================= TRENDING ================= */
   const trendingNotes = notes
-    .filter(
-      (n) => (n.download_count || 0) >= 5 || isNewNote(n.created_at)
-    )
+    .filter((n) => isNewNote(n.created_at))
     .slice(0, 4);
 
   /* ================= UI ================= */
   return (
     <div className="notes-page">
-      <div className="notes-header">
-        <h2>Notes</h2>
-        <p>Browse and download MCA study materials</p>
-      </div>
+      <h2>Notes</h2>
+      <p>Browse and download MCA study materials</p>
 
-      {/* SAVED TOGGLE */}
-      <button className="saved-toggle" onClick={() => setShowSaved(!showSaved)}>
+      <button onClick={() => setShowSaved(!showSaved)}>
         {showSaved ? "Show All Notes" : "Show Saved"}
       </button>
 
@@ -199,23 +174,23 @@ function Notes() {
           disabled={!semester}
         >
           <option value="">Select Subject</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+          {subjects.map((sub) => (
+            <option key={sub.id} value={sub.id}>{sub.name}</option>
           ))}
         </select>
       </div>
 
-      {loading && <p className="loading">Loading notes...</p>}
+      {loading && <p>Loading...</p>}
 
       {/* TRENDING */}
       {!loading && trendingNotes.length > 0 && (
         <div className="trending-section">
-          <h3>🔥 Trending Notes</h3>
+          <h3>🔥 New Notes</h3>
           <div className="trending-grid">
             {trendingNotes.map((note) => (
               <div key={note.id} className="trending-card">
                 <h4>{note.title}</h4>
-                <p>{note.subject.name} • {note.subject.semester.name}</p>
+                <p>{note.subject.name}</p>
                 <button onClick={() => handleView(note)}>View</button>
               </div>
             ))}
@@ -223,13 +198,7 @@ function Notes() {
         </div>
       )}
 
-      {/* NOTES */}
-      {!loading && displayNotes.length === 0 && (
-        <div className="empty-state">
-          <p>No notes found 📂</p>
-        </div>
-      )}
-
+      {/* NOTES GRID */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
           <div
@@ -245,9 +214,7 @@ function Notes() {
 
             <div className="note-actions">
               <button onClick={() => handleView(note)}>👁 View</button>
-              <button onClick={() => handleDownload(note)}>
-                ⬇ {note.download_count || 0}
-              </button>
+              <button onClick={() => handleDownload(note)}>⬇ Download</button>
               <button onClick={() => toggleBookmark(note.id)}>
                 {bookmarks.includes(note.id) ? "⭐" : "☆"}
               </button>
@@ -258,5 +225,3 @@ function Notes() {
     </div>
   );
 }
-
-export default Notes;
