@@ -7,21 +7,23 @@ const api = axios.create({
   },
 });
 
-// Attach token ONLY for protected routes
+/* ================================
+   REQUEST INTERCEPTOR
+================================ */
 api.interceptors.request.use(
   (config) => {
-    const authFree = [
+    const publicRoutes = [
       "/auth/login/",
       "/auth/register/",
       "/auth/forgot-password/",
       "/auth/reset-password/",
     ];
 
-    const isAuthFree = authFree.some((url) =>
-      config.url?.endsWith(url)
+    const isPublic = publicRoutes.some((route) =>
+      config.url?.includes(route)
     );
 
-    if (!isAuthFree) {
+    if (!isPublic) {
       const token = localStorage.getItem("access");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -31,6 +33,21 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+/* ================================
+   RESPONSE INTERCEPTOR
+================================ */
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // 🔐 Auto logout on token expiry
+    if (error.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default api;
