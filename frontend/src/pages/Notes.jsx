@@ -12,21 +12,24 @@ const isNewNote = (createdAt) => {
 
 /* ================= NOTES PAGE ================= */
 function Notes() {
+  /* ================= DATA ================= */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /* ================= FILTERS ================= */
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("");
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
 
+  /* ================= BOOKMARKS ================= */
   const [bookmarks, setBookmarks] = useState(
     JSON.parse(localStorage.getItem("bookmarks")) || []
   );
-  const [showSaved] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
 
   /* ================= FETCH NOTES ================= */
   useEffect(() => {
@@ -79,7 +82,7 @@ function Notes() {
       .catch(() => setSubjects([]));
   }, [semester]);
 
-  /* ================= FILTER ================= */
+  /* ================= FILTER NOTES ================= */
   const filteredNotes = notes.filter((note) => {
     return (
       note.title.toLowerCase().includes(search.toLowerCase()) &&
@@ -103,44 +106,26 @@ function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW (FIXED) ================= */
+  /* ================= VIEW ================= */
   const handleView = (note) => {
     if (!note.file) {
-      alert("File not available");
+      alert("PDF not available");
       return;
     }
     window.open(note.file, "_blank");
   };
 
-  /* ================= DOWNLOAD (FIXED) ================= */
+  /* ================= DOWNLOAD ================= */
   const handleDownload = async (note) => {
     try {
-      // increase download count
-      const handleDownload = async (note) => {
-  try {
-    // hit backend to increase count (CORRECT URL + GET)
-    await api.get(`notes/${note.id}/download/`);
-  } catch (err) {
-    console.warn("Download count failed");
-  }
-
-  if (!note.file) {
-    alert("File not available");
-    return;
-  }
-
-  const link = document.createElement("a");
-  link.href = note.file;
-  link.download = `${note.title}.pdf`;
-  link.target = "_blank";
-  link.click();
-};
+      // increase download count (backend endpoint)
+      await api.get(`notes/notes/${note.id}/download/`);
     } catch {
       console.warn("Download count failed");
     }
 
     if (!note.file) {
-      alert("File not available");
+      alert("PDF not available");
       return;
     }
 
@@ -174,13 +159,115 @@ function Notes() {
   /* ================= UI ================= */
   return (
     <div className="notes-page">
+      {/* HEADER */}
       <div className="notes-header">
         <h2>Notes</h2>
         <p>Browse and download MCA study materials</p>
       </div>
 
+      {/* HERO STATS */}
+      <div className="hero-stats">
+        <div className="stat-card">
+          <span>📚</span>
+          <div>
+            <p className="stat-value">{notes.length}</p>
+            <p>Total Notes</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <span>⭐</span>
+          <div>
+            <p className="stat-value">{bookmarks.length}</p>
+            <p>Saved</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <span>🔥</span>
+          <div>
+            <p className="stat-value">
+              {notes.filter((n) => isNewNote(n.created_at)).length}
+            </p>
+            <p>New This Week</p>
+          </div>
+        </div>
+      </div>
+
+      {/* SAVED TOGGLE */}
+      <button
+        className="saved-toggle"
+        onClick={() => setShowSaved(!showSaved)}
+      >
+        {showSaved ? "Show All Notes" : "Show Saved"}
+      </button>
+
+      {/* FILTER BAR */}
+      <div className="filters-bar">
+        <input
+          placeholder="Search notes"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <select value={year} onChange={(e) => setYear(e.target.value)}>
+          <option value="">Select MCA Year</option>
+          {years.map((y) => (
+            <option key={y.id} value={y.id}>
+              {y.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={semester}
+          onChange={(e) => setSemester(e.target.value)}
+          disabled={!year}
+        >
+          <option value="">Select Semester</option>
+          {semesters.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          disabled={!semester}
+        >
+          <option value="">Select Subject</option>
+          {subjects.map((sub) => (
+            <option key={sub.id} value={sub.id}>
+              {sub.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* LOADING */}
       {loading && <p>Loading...</p>}
 
+      {/* TRENDING */}
+      {!loading && trendingNotes.length > 0 && (
+        <div className="trending-section">
+          <h3>🔥 Trending Notes</h3>
+          <div className="trending-grid">
+            {trendingNotes.map((note) => (
+              <div key={note.id} className="trending-card">
+                <h4>{note.title}</h4>
+                <p>
+                  {note.subject.name} • {note.subject.semester.name}
+                </p>
+                <button onClick={() => handleView(note)}>View</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* NOTES GRID */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
           <div
@@ -193,17 +280,8 @@ function Notes() {
               <span className="new-badge">NEW</span>
             )}
 
-            <div className="note-header">
-              <h3>{note.title}</h3>
-              <button
-                className="bookmark-btn"
-                onClick={() => toggleBookmark(note.id)}
-              >
-                {bookmarks.includes(note.id) ? "⭐" : "☆"}
-              </button>
-            </div>
-
-            <p className="note-meta">
+            <h3>{note.title}</h3>
+            <p>
               {note.subject.name} • {note.subject.semester.name}
             </p>
 
@@ -211,6 +289,9 @@ function Notes() {
               <button onClick={() => handleView(note)}>👁 View</button>
               <button onClick={() => handleDownload(note)}>
                 ⬇ {note.download_count || 0}
+              </button>
+              <button onClick={() => toggleBookmark(note.id)}>
+                {bookmarks.includes(note.id) ? "⭐" : "☆"}
               </button>
             </div>
           </div>
