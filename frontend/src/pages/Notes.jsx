@@ -2,11 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
-/* ================= HELPER ================= */
+/* ================= UTIL ================= */
 const isNewNote = (createdAt) => {
-  const noteDate = new Date(createdAt);
+  const created = new Date(createdAt);
   const now = new Date();
-  return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
+  return (now - created) / (1000 * 60 * 60 * 24) <= 7;
 };
 
 function Notes() {
@@ -27,29 +27,39 @@ function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH ================= */
+  /* ================= FETCH INITIAL ================= */
   useEffect(() => {
-    Promise.all([
-      api.get("notes/"),
-      api.get("notes/years/")
-    ])
-      .then(([notesRes, yearsRes]) => {
+    const load = async () => {
+      try {
+        const [notesRes, yearsRes] = await Promise.all([
+          api.get("notes/"),
+          api.get("notes/years/"),
+        ]);
+
         setNotes(notesRes.data || []);
         setYears(yearsRes.data || []);
-      })
-      .catch(() => {
+      } catch (err) {
+        console.error(err);
         localStorage.clear();
         window.location.href = "/login";
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   /* ================= SEMESTERS ================= */
   useEffect(() => {
     if (!year) {
       setSemesters([]);
+      setSemester("");
+      setSubjects([]);
+      setSubject("");
       return;
     }
+
     api
       .get(`notes/semesters/?year=${year}`)
       .then((res) => setSemesters(res.data || []))
@@ -60,8 +70,10 @@ function Notes() {
   useEffect(() => {
     if (!semester) {
       setSubjects([]);
+      setSubject("");
       return;
     }
+
     api
       .get(`notes/subjects/?semester=${semester}`)
       .then((res) => setSubjects(res.data || []))
@@ -69,12 +81,14 @@ function Notes() {
   }, [semester]);
 
   /* ================= FILTER ================= */
-  const filteredNotes = notes.filter((n) =>
-    n.title.toLowerCase().includes(search.toLowerCase()) &&
-    (!year || n.subject.semester.year.id === Number(year)) &&
-    (!semester || n.subject.semester.id === Number(semester)) &&
-    (!subject || n.subject.id === Number(subject))
-  );
+  const filteredNotes = notes.filter((n) => {
+    return (
+      n.title.toLowerCase().includes(search.toLowerCase()) &&
+      (!year || n.subject.semester.year.id === Number(year)) &&
+      (!semester || n.subject.semester.id === Number(semester)) &&
+      (!subject || n.subject.id === Number(subject))
+    );
+  });
 
   const displayNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
@@ -90,20 +104,23 @@ function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW PDF ================= */
+  /* ================= VIEW ================= */
   const handleView = (note) => {
     if (!note.file) {
       alert("PDF not available");
       return;
     }
-    window.open(note.file, "_blank");
+    window.open(note.file, "_blank", "noopener,noreferrer");
   };
 
-  /* ================= DOWNLOAD PDF ================= */
+  /* ================= DOWNLOAD ================= */
   const handleDownload = async (note) => {
     try {
+      // 🔥 increase download count (POST only)
       await api.post(`notes/notes/${note.id}/download/`);
-    } catch {}
+    } catch (e) {
+      console.warn("Download count update failed");
+    }
 
     if (!note.file) {
       alert("PDF not available");
@@ -117,6 +134,19 @@ function Notes() {
     link.click();
   };
 
+  /* ================= SWIPE (MOBILE) ================= */
+  const touchStartX = useRef(0);
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e, note) => {
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (diff > 80) handleDownload(note);
+    if (diff < -80) toggleBookmark(note.id);
+  };
+
   /* ================= TRENDING ================= */
   const trendingNotes = notes
     .filter(
@@ -127,13 +157,17 @@ function Notes() {
   /* ================= UI ================= */
   return (
     <div className="notes-page">
-      <h2>Notes</h2>
-      <p>Browse and download MCA study materials</p>
+      <div className="notes-header">
+        <h2>Notes</h2>
+        <p>Browse and download MCA study materials</p>
+      </div>
 
-      <button onClick={() => setShowSaved(!showSaved)}>
+      {/* SAVED TOGGLE */}
+      <button className="saved-toggle" onClick={() => setShowSaved(!showSaved)}>
         {showSaved ? "Show All Notes" : "Show Saved"}
       </button>
 
+      {/* FILTERS */}
       <div className="filters-bar">
         <input
           placeholder="Search notes"
@@ -165,14 +199,15 @@ function Notes() {
           disabled={!semester}
         >
           <option value="">Select Subject</option>
-          {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>{sub.name}</option>
+          {subjects.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
       </div>
 
-      {loading && <p>Loading...</p>}
+      {loading && <p className="loading">Loading notes...</p>}
 
+      {/* TRENDING */}
       {!loading && trendingNotes.length > 0 && (
         <div className="trending-section">
           <h3>🔥 Trending Notes</h3>
@@ -188,9 +223,21 @@ function Notes() {
         </div>
       )}
 
+      {/* NOTES */}
+      {!loading && displayNotes.length === 0 && (
+        <div className="empty-state">
+          <p>No notes found 📂</p>
+        </div>
+      )}
+
       <div className="notes-grid">
         {displayNotes.map((note) => (
-          <div key={note.id} className="note-card">
+          <div
+            key={note.id}
+            className="note-card"
+            onTouchStart={onTouchStart}
+            onTouchEnd={(e) => onTouchEnd(e, note)}
+          >
             {isNewNote(note.created_at) && <span className="new-badge">NEW</span>}
 
             <h3>{note.title}</h3>
