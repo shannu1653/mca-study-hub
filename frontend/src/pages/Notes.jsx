@@ -107,34 +107,45 @@ function Notes() {
   };
 
   /* ================= VIEW ================= */
-  const handleView = (note) => {
-    if (!note.file) {
-      alert("PDF not available");
-      return;
-    }
-    window.open(note.file, "_blank");
-  };
+  /* ================= VIEW PDF ================= */
+const handleView = async (note) => {
+  try {
+    const res = await api.get(`notes/${note.id}/`, {
+      responseType: "blob",
+    });
 
-  /* ================= DOWNLOAD ================= */
-  const handleDownload = async (note) => {
-    try {
-      // increase download count (backend endpoint)
-      await api.get(`notes/notes/${note.id}/download/`);
-    } catch {
-      console.warn("Download count failed");
-    }
+    const fileURL = URL.createObjectURL(
+      new Blob([res.data], { type: "application/pdf" })
+    );
 
-    if (!note.file) {
-      alert("PDF not available");
-      return;
-    }
+    window.open(fileURL);
+  } catch (err) {
+    alert("Unable to open PDF");
+    console.error(err);
+  }
+};
+
+/* ================= DOWNLOAD PDF ================= */
+const handleDownload = async (note) => {
+  try {
+    const res = await api.get(`notes/notes/${note.id}/download/`, {
+      responseType: "blob",
+    });
+
+    const url = URL.createObjectURL(
+      new Blob([res.data], { type: "application/pdf" })
+    );
 
     const link = document.createElement("a");
-    link.href = note.file;
+    link.href = url;
     link.download = `${note.title}.pdf`;
-    link.target = "_blank";
     link.click();
-  };
+  } catch (err) {
+    alert("Download failed");
+    console.error(err);
+  }
+};
+
 
   /* ================= SWIPE ================= */
   const touchStartX = useRef(0);
