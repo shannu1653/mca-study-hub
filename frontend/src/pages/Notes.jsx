@@ -2,15 +2,24 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
-/* ================= HELPER ================= */
-const isNewNote = (createdAt) => {
-  const noteDate = new Date(createdAt);
-  const now = new Date();
-  return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
+/* ================= UTIL ================= */
+const isNewNote = (date) => {
+  if (!date) return false;
+  const d = new Date(date);
+  return (Date.now() - d.getTime()) / 86400000 <= 7;
 };
 
+const Skeleton = () => (
+  <div className="note-card skeleton">
+    <div className="skeleton-title" />
+    <div className="skeleton-meta" />
+    <div className="skeleton-actions" />
+  </div>
+);
+
+/* ================= PAGE ================= */
 function Notes() {
-  /* ================= STATE ================= */
+  /* ---------- STATE ---------- */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
@@ -27,186 +36,163 @@ function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH DATA ================= */
+  /* ---------- FETCH ---------- */
   useEffect(() => {
-    Promise.all([
-      api.get("notes/"),
-      api.get("notes/years/"),
-    ])
-      .then(([notesRes, yearsRes]) => {
-        setNotes(notesRes.data || []);
-        setYears(yearsRes.data || []);
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const [n, y] = await Promise.all([
+          api.get("notes/"),
+          api.get("notes/years/"),
+        ]);
+        setNotes(n.data || []);
+        setYears(y.data || []);
+      } catch {
         localStorage.clear();
         window.location.href = "/login";
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  /* ================= SEMESTERS ================= */
   useEffect(() => {
-    if (!year) {
-      setSemesters([]);
-      return;
-    }
-    api
-      .get(`notes/semesters/?year=${year}`)
-      .then((res) => setSemesters(res.data || []))
-      .catch(() => setSemesters([]));
+    if (!year) return setSemesters([]);
+    api.get(`notes/semesters/?year=${year}`).then(r => setSemesters(r.data || []));
   }, [year]);
 
-  /* ================= SUBJECTS ================= */
   useEffect(() => {
-    if (!semester) {
-      setSubjects([]);
-      return;
-    }
-    api
-      .get(`notes/subjects/?semester=${semester}`)
-      .then((res) => setSubjects(res.data || []))
-      .catch(() => setSubjects([]));
+    if (!semester) return setSubjects([]);
+    api.get(`notes/subjects/?semester=${semester}`).then(r => setSubjects(r.data || []));
   }, [semester]);
 
-  /* ================= FILTER ================= */
-  const filteredNotes = notes.filter((n) =>
-    n.title.toLowerCase().includes(search.toLowerCase()) &&
-    (!year || n.subject.semester.year.id === Number(year)) &&
-    (!semester || n.subject.semester.id === Number(semester)) &&
-    (!subject || n.subject.id === Number(subject))
+  /* ---------- FILTER ---------- */
+  const filtered = notes.filter(n =>
+    n?.title?.toLowerCase().includes(search.toLowerCase()) &&
+    (!year || n?.subject?.semester?.year?.id === Number(year)) &&
+    (!semester || n?.subject?.semester?.id === Number(semester)) &&
+    (!subject || n?.subject?.id === Number(subject))
   );
 
   const displayNotes = showSaved
-    ? filteredNotes.filter((n) => bookmarks.includes(n.id))
-    : filteredNotes;
+    ? filtered.filter(n => bookmarks.includes(n.id))
+    : filtered;
 
-  /* ================= BOOKMARK ================= */
+  /* ---------- BOOKMARK ---------- */
   const toggleBookmark = (id) => {
     const updated = bookmarks.includes(id)
-      ? bookmarks.filter((b) => b !== id)
+      ? bookmarks.filter(b => b !== id)
       : [...bookmarks, id];
 
     setBookmarks(updated);
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW PDF ================= */
+  /* ---------- VIEW ---------- */
   const handleView = (note) => {
-    if (!note.file) {
+    if (!note?.pdf) {
       alert("PDF not available");
       return;
     }
-    window.open(note.file, "_blank");
+    window.open(note.pdf, "_blank");
   };
 
-  /* ================= DOWNLOAD PDF ================= */
+  /* ---------- DOWNLOAD ---------- */
   const handleDownload = async (note) => {
-    try {
-      // increase count only
-      await api.post(`notes/notes/${note.id}/download/`);
-    } catch {
-      console.warn("Download count update failed");
-    }
-
-    if (!note.file) {
+    if (!note?.pdf) {
       alert("PDF not available");
       return;
     }
 
-    const link = document.createElement("a");
-    link.href = note.file;
-    link.download = `${note.title}.pdf`;
-    link.target = "_blank";
-    link.click();
+    // optimistic update
+    setNotes(prev =>
+      prev.map(n =>
+        n.id === note.id
+          ? { ...n, download_count: (n.download_count || 0) + 1 }
+          : n
+      )
+    );
+
+    // backend count update (GET only)
+    api.get(`notes/notes/${note.id}/download/`).catch(() => {});
+
+    window.open(note.pdf, "_blank");
   };
 
-  /* ================= SWIPE ================= */
-  const touchStartX = useRef(0);
-  const onTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
+  /* ---------- SWIPE ---------- */
+  const touchX = useRef(0);
+  const onTouchStart = e => (touchX.current = e.touches[0].clientX);
   const onTouchEnd = (e, note) => {
-    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const diff = e.changedTouches[0].clientX - touchX.current;
     if (diff > 80) handleDownload(note);
     if (diff < -80) toggleBookmark(note.id);
   };
 
-  /* ================= TRENDING ================= */
-  const trendingNotes = notes
-    .filter(
-      (n) => (n.download_count || 0) >= 5 || isNewNote(n.created_at)
-    )
+  /* ---------- TRENDING ---------- */
+  const trending = notes
+    .filter(n => (n.download_count || 0) >= 5 || isNewNote(n.created_at))
     .slice(0, 4);
 
-  /* ================= UI ================= */
+  /* ---------- UI ---------- */
   return (
     <div className="notes-page">
       <h2>Notes</h2>
       <p>Browse and download MCA study materials</p>
 
       <button onClick={() => setShowSaved(!showSaved)}>
-        {showSaved ? "Show All Notes" : "Show Saved"}
+        {showSaved ? "Show All" : "Show Saved"}
       </button>
 
       <div className="filters-bar">
-        <input
-          placeholder="Search notes"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
 
-        <select value={year} onChange={(e) => setYear(e.target.value)}>
+        <select value={year} onChange={e => setYear(e.target.value)}>
           <option value="">Select MCA Year</option>
-          {years.map((y) => (
-            <option key={y.id} value={y.id}>{y.name}</option>
-          ))}
+          {years.map(y => <option key={y.id} value={y.id}>{y.name}</option>)}
         </select>
 
-        <select
-          value={semester}
-          onChange={(e) => setSemester(e.target.value)}
-          disabled={!year}
-        >
+        <select value={semester} onChange={e => setSemester(e.target.value)} disabled={!year}>
           <option value="">Select Semester</option>
-          {semesters.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
-          ))}
+          {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
 
-        <select
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          disabled={!semester}
-        >
+        <select value={subject} onChange={e => setSubject(e.target.value)} disabled={!semester}>
           <option value="">Select Subject</option>
-          {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>{sub.name}</option>
-          ))}
+          {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
       </div>
 
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="notes-grid">
+          {[1,2,3].map(i => <Skeleton key={i} />)}
+        </div>
+      )}
 
-      {!loading && trendingNotes.length > 0 && (
+      {!loading && trending.length > 0 && (
         <div className="trending-section">
-          <h3>🔥 Trending Notes</h3>
+          <h3>🔥 Trending</h3>
           <div className="trending-grid">
-            {trendingNotes.map((note) => (
-              <div key={note.id} className="trending-card">
-                <h4>{note.title}</h4>
-                <p>{note.subject.name} • {note.subject.semester.name}</p>
-                <button onClick={() => handleView(note)}>View</button>
+            {trending.map(n => (
+              <div key={n.id} className="trending-card">
+                <h4>{n.title}</h4>
+                <p>{n.subject.name} • {n.subject.semester.name}</p>
+                <button onClick={() => handleView(n)}>View</button>
               </div>
             ))}
           </div>
         </div>
       )}
 
+      {!loading && displayNotes.length === 0 && (
+        <p style={{ textAlign: "center" }}>No notes found</p>
+      )}
+
       <div className="notes-grid">
-        {displayNotes.map((note) => (
+        {displayNotes.map(note => (
           <div
             key={note.id}
             className="note-card"
             onTouchStart={onTouchStart}
-            onTouchEnd={(e) => onTouchEnd(e, note)}
+            onTouchEnd={e => onTouchEnd(e, note)}
           >
             {isNewNote(note.created_at) && <span className="new-badge">NEW</span>}
 
