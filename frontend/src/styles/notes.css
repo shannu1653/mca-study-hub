@@ -1,357 +1,265 @@
-/* ===============================
-   ROOT & GLOBAL
-================================ */
-:root {
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
-  --bg-card: #ffffff;
-  --bg-muted: #f1f5f9;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --transition: 0.25s ease;
-}
-
-body.dark {
-  --bg-card: #020617;
-  --bg-muted: #020617;
-  --text-main: #e5e7eb;
-  --text-muted: #94a3b8;
-}
-
-/* ===============================
-   PAGE HEADER
-================================ */
+/* ================= PAGE ================= */
 .notes-page {
-  padding: 10px 0;
-}
-
-.notes-header {
-  margin-bottom: 24px;
-}
-
-.notes-header h2 {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.notes-header p {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-/* ===============================
-   FILTER BAR
-================================ */
-.filters-bar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: #fff7d6;
   padding: 16px;
-  border-radius: var(--radius-lg);
-  margin-bottom: 24px;
-  animation: slideDown 0.4s ease;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.notes-page h2 {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.notes-page p {
+  color: #666;
+  margin-bottom: 16px;
+}
+
+/* ================= FILTER BAR ================= */
+.filters-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
 }
 
 .filters-bar input,
 .filters-bar select {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
   font-size: 14px;
-  min-width: 180px;
-  transition: box-shadow var(--transition);
 }
 
-.filters-bar input:focus,
-.filters-bar select:focus {
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
-}
-
-.reset-btn {
-  background: #fde68a;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* ===============================
-   GRID
-================================ */
+/* ================= NOTES GRID ================= */
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 16px;
+  margin-top: 20px;
 }
 
-/* ===============================
-   NOTE CARD (CORE)
-================================ */
+/* ================= NOTE CARD ================= */
 .note-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   position: relative;
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  will-change: transform;
-  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .note-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.14);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
 }
 
-/* Active press (mobile feel) */
-.note-card:active {
-  transform: scale(0.97);
-}
-
-/* ===============================
-   NEW BADGE
-================================ */
+/* ================= NEW BADGE ================= */
 .new-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #ef4444;
-  color: white;
+  top: 10px;
+  right: 10px;
+  background: #ff4d4f;
+  color: #fff;
   font-size: 11px;
-  font-weight: 700;
   padding: 4px 8px;
-  border-radius: 999px;
+  border-radius: 20px;
 }
 
-/* ===============================
-   NOTE HEADER
-================================ */
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+/* ================= NOTE TEXT ================= */
+.note-card h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 
-.note-header h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.bookmark-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* ===============================
-   META & INFO
-================================ */
-.note-meta {
+.note-card p {
   font-size: 13px;
-  color: var(--text-muted);
-  margin: 6px 0 10px;
+  color: #777;
+  margin-bottom: 12px;
 }
 
-.note-subject {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-/* ===============================
-   PDF PREVIEW
-================================ */
-
-
-/* ===============================
-   ACTION BUTTONS
-================================ */
+/* ================= ACTIONS ================= */
 .note-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  justify-content: space-between;
 }
 
 .note-actions button {
   flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
   border: none;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
   cursor: pointer;
-  transition: transform var(--transition), background var(--transition);
+  transition: background 0.2s ease;
 }
 
-.note-actions button:first-child {
-  background: #e0f2fe;
-  color: #0369a1;
+/* View */
+.note-actions button:nth-child(1) {
+  background: #e7f1ff;
+  color: #1d4ed8;
 }
 
-.note-actions button:last-child {
-  background: var(--primary);
-  color: white;
+/* Download */
+.note-actions button:nth-child(2) {
+  background: #e6fffa;
+  color: #047857;
+}
+
+/* Bookmark */
+.note-actions button:nth-child(3) {
+  background: #fff7e6;
+  color: #b45309;
 }
 
 .note-actions button:hover {
-  transform: translateY(-2px);
-  background: var(--primary-dark);
+  opacity: 0.9;
 }
 
-/* ===============================
-   CATEGORY CHIPS
-================================ */
-.category-chips {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 12px 0 22px;
+/* ================= TRENDING ================= */
+.trending-section {
+  margin-top: 30px;
 }
 
-.chip {
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--bg-card);
-  border: 1px solid #cbd5f5;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.chip:hover {
-  background: #eff6ff;
-}
-
-.chip.active {
-  background: linear-gradient(135deg, #2563eb, #38bdf8);
-  color: white;
-  border-color: transparent;
-}
-
-/* ===============================
-   HERO STATS
-================================ */
-.hero-stats {
+.trending-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-  gap: 16px;
-  margin: 20px 0 28px;
-}
-
-.stat-card {
-  display: flex;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 14px;
-  padding: 16px;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  transition: transform var(--transition);
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.stat-label {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-/* ===============================
-   SKELETON LOADER
-================================ */
-.skeleton-card {
-  height: 280px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.4s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: 0 0; }
-}
-
-/* ===============================
-   ANIMATIONS
-================================ */
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===============================
-   MOBILE OPTIMIZATION
-================================ */
-@media (max-width: 768px) {
-  .filters-bar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-
- 
-
-  .note-actions button {
-    padding: 14px;
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-stats {
-    grid-template-columns: 1fr;
-  }
-}
-/* ===============================
-   PDF PREVIEW PLACEHOLDER
-================================ */
-.pdf-preview {
-  height: 140px;
+.trending-card {
+  padding: 14px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+/* ================= PDF PREVIEW ================= */
+.pdf-preview {
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0369a1;
+  gap: 10px;
+}
+
+.pdf-icon {
+  font-size: 28px;
+}
+
+.pdf-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-info span {
+  font-size: 13px;
+  color: #374151;
+}
+
+.pdf-info small {
+  font-size: 11px;
+  color: #6b7280;
+}
+.pdf-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 10px;
   margin: 10px 0;
+}
+
+.pdf-icon {
+  font-size: 26px;
+}
+
+.pdf-info span {
+  font-weight: 600;
+  display: block;
+}
+
+.pdf-info small {
+  color: #6b7280;
+}
+.pdf-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
+  margin: 10px 0;
 }
 
-.note-card:hover .pdf-preview {
-  transform: scale(1.03);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-}
-.bookmark-btn:hover {
-  transform: scale(1.15);
-}
-.note-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-lg);
-  pointer-events: none;
-  transition: box-shadow var(--transition);
+.pdf-preview:hover {
+  background: #eef2ff;
 }
 
-.note-card:hover::after {
-  box-shadow: inset 0 0 0 1px rgba(37,99,235,0.25);
+.pdf-preview.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
+.note-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Skeleton Loader */
+.skeleton {
+  background: #f3f4f6;
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-title {
+  height: 18px;
+  width: 70%;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.skeleton-text {
+  height: 14px;
+  width: 50%;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+
+.skeleton-actions {
+  height: 36px;
+  width: 100%;
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+.pdf-viewer {
+  margin-top: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pdf-viewer iframe {
+  border: none;
+  background: #fff;
+}
+
+.close-pdf {
+  width: 100%;
+  padding: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

@@ -2,12 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
-/* ================= HELPER ================= */
+/* ================= HELPERS ================= */
 const isNewNote = (createdAt) => {
   const noteDate = new Date(createdAt);
   const now = new Date();
   return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
 };
+
+const ITEMS_PER_PAGE = 6;
 
 export default function Notes() {
   /* ================= STATE ================= */
@@ -27,7 +29,10 @@ export default function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH NOTES + YEARS ================= */
+  const [activePdf, setActivePdf] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
+  /* ================= FETCH ================= */
   useEffect(() => {
     Promise.all([
       api.get("notes/"),
@@ -44,6 +49,11 @@ export default function Notes() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  /* ================= RESET SCROLL ================= */
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [search, year, semester, subject, showSaved]);
 
   /* ================= SEMESTERS ================= */
   useEffect(() => {
@@ -81,9 +91,11 @@ export default function Notes() {
     (!subject || n.subject.id === Number(subject))
   );
 
-  const displayNotes = showSaved
+  const finalNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
     : filteredNotes;
+
+  const displayNotes = finalNotes.slice(0, visibleCount);
 
   /* ================= BOOKMARK ================= */
   const toggleBookmark = (id) => {
@@ -95,16 +107,16 @@ export default function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW PDF (FIXED) ================= */
+  /* ================= VIEW PDF ================= */
   const handleView = (note) => {
     if (!note.file) {
       alert("PDF not available");
       return;
     }
-    window.open(note.file, "_blank");
+    setActivePdf(activePdf === note.id ? null : note.id);
   };
 
-  /* ================= DOWNLOAD PDF (FIXED) ================= */
+  /* ================= DOWNLOAD ================= */
   const handleDownload = (note) => {
     if (!note.file) {
       alert("PDF not available");
@@ -118,24 +130,27 @@ export default function Notes() {
     link.click();
   };
 
-  /* ================= SWIPE SUPPORT ================= */
-  const touchStartX = useRef(0);
-  const onTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
-  const onTouchEnd = (e, note) => {
-    const diff = e.changedTouches[0].clientX - touchStartX.current;
-    if (diff > 80) handleDownload(note);
-    if (diff < -80) toggleBookmark(note.id);
-  };
+  /* ================= INFINITE SCROLL ================= */
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200
+      ) {
+        if (visibleCount < finalNotes.length) {
+          setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+        }
+      }
+    };
 
-  /* ================= TRENDING ================= */
-  const trendingNotes = notes
-    .filter((n) => isNewNote(n.created_at))
-    .slice(0, 4);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [visibleCount, finalNotes.length]);
 
   /* ================= UI ================= */
   return (
     <div className="notes-page">
-      <h2>Notes</h2>
+      <h2>📚 Notes</h2>
       <p>Browse and download MCA study materials</p>
 
       <button onClick={() => setShowSaved(!showSaved)}>
@@ -182,35 +197,29 @@ export default function Notes() {
 
       {loading && <p>Loading...</p>}
 
-      {/* TRENDING */}
-      {!loading && trendingNotes.length > 0 && (
-        <div className="trending-section">
-          <h3>🔥 New Notes</h3>
-          <div className="trending-grid">
-            {trendingNotes.map((note) => (
-              <div key={note.id} className="trending-card">
-                <h4>{note.title}</h4>
-                <p>{note.subject.name}</p>
-                <button onClick={() => handleView(note)}>View</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* NOTES GRID */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
-          <div
-            key={note.id}
-            className="note-card"
-            onTouchStart={onTouchStart}
-            onTouchEnd={(e) => onTouchEnd(e, note)}
-          >
+          <div key={note.id} className="note-card">
             {isNewNote(note.created_at) && <span className="new-badge">NEW</span>}
 
             <h3>{note.title}</h3>
-            <p>{note.subject.name} • {note.subject.semester.name}</p>
+            <p className="note-meta">
+              {note.subject?.name} • {note.subject?.semester?.name}
+            </p>
+
+            <div className="pdf-preview" onClick={() => handleView(note)}>
+              📄 PDF • {note.download_count || 0} downloads
+            </div>
+
+            {activePdf === note.id && (
+              <iframe
+                src={note.file}
+                title={note.title}
+                width="100%"
+                height="420"
+              />
+            )}
 
             <div className="note-actions">
               <button onClick={() => handleView(note)}>👁 View</button>
@@ -222,6 +231,12 @@ export default function Notes() {
           </div>
         ))}
       </div>
+
+      {visibleCount < finalNotes.length && (
+        <p style={{ textAlign: "center", margin: 20 }}>
+          Loading more notes...
+        </p>
+      )}
     </div>
   );
 }
