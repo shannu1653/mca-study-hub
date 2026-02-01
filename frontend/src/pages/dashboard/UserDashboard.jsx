@@ -1,9 +1,8 @@
 // src/pages/dashboard/UserDashboard.jsx
 import { useEffect, useState } from "react";
 import "../../styles/dashboard.css";
+
 import StatCard from "../../components/StatCard";
-// import NotesChartBox from "../../components/dashboard/NotesChartBox";
-// import SubjectChartBox from "../../components/dashboard/SubjectChartBox";
 import { getUserDashboardStats } from "../../api/dashboardApi";
 import ErrorState from "../../components/ui/ErrorState";
 import EmptyState from "../../components/ui/EmptyState";
@@ -65,7 +64,6 @@ export default function UserDashboard() {
     <div className="user-dashboard">
       <h2 className="dashboard-title">Overview</h2>
 
-
       {/* ===== STATS ===== */}
       <div className="stats-grid">
         <StatCard title="Total Notes" value={stats.total_notes || 0} />
@@ -73,12 +71,6 @@ export default function UserDashboard() {
         <StatCard title="Subjects" value={stats.subjects || 0} />
         <StatCard title="Semesters" value={stats.semesters || 0} />
       </div>
-
-      {/* ===== CHARTS ===== */}
-      {/* <div className="charts-grid">
-        <NotesChartBox data={stats.notes_per_semester || []} />
-        <SubjectChartBox data={stats.notes_per_subject || []} />
-      </div> */}
     </div>
   );
 }
