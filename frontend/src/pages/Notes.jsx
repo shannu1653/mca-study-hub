@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
 import api from "../api/axios";
 import "../styles/notes.css";
 
-/* ================= HELPER: NEW BADGE ================= */
+/* ================= HELPER ================= */
 const isNewNote = (createdAt) => {
   const noteDate = new Date(createdAt);
   const now = new Date();
@@ -13,26 +12,23 @@ const isNewNote = (createdAt) => {
 
 /* ================= NOTES PAGE ================= */
 function Notes() {
-  /* ================= DATA ================= */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* ================= FILTERS ================= */
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("");
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
 
-  /* ================= BOOKMARKS ================= */
   const [bookmarks, setBookmarks] = useState(
     JSON.parse(localStorage.getItem("bookmarks")) || []
   );
-  const [showSaved, setShowSaved] = useState(false);
+  const [showSaved] = useState(false);
 
-  /* ================= FETCH NOTES + YEARS ================= */
+  /* ================= FETCH NOTES ================= */
   useEffect(() => {
     fetchAll();
   }, []);
@@ -83,7 +79,7 @@ function Notes() {
       .catch(() => setSubjects([]));
   }, [semester]);
 
-  /* ================= FILTER NOTES ================= */
+  /* ================= FILTER ================= */
   const filteredNotes = notes.filter((note) => {
     return (
       note.title.toLowerCase().includes(search.toLowerCase()) &&
@@ -107,48 +103,35 @@ function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= DOWNLOAD ================= */
- const handleView = async (note) => {
-  try {
-    const token = localStorage.getItem("access");
+  /* ================= VIEW (FIXED) ================= */
+  const handleView = (note) => {
+    if (!note.file) {
+      alert("File not available");
+      return;
+    }
+    window.open(note.file, "_blank");
+  };
 
-    const res = await api.get(`notes/${note.id}/view/`, {
-      responseType: "blob",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  /* ================= DOWNLOAD (FIXED) ================= */
+  const handleDownload = async (note) => {
+    try {
+      // increase download count
+      await api.post(`notes/notes/${note.id}/download/`);
+    } catch {
+      console.warn("Download count failed");
+    }
 
-    const fileURL = URL.createObjectURL(
-      new Blob([res.data], { type: "application/pdf" })
-    );
+    if (!note.file) {
+      alert("File not available");
+      return;
+    }
 
-    window.open(fileURL);
-  } catch {
-    alert("Unable to open PDF");
-  }
-};
-
-const handleDownload = async (note) => {
-  try {
-    const token = localStorage.getItem("access");
-
-    const res = await api.get(`notes/${note.id}/download/`, {
-      responseType: "blob",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const url = URL.createObjectURL(new Blob([res.data]));
     const link = document.createElement("a");
-    link.href = url;
+    link.href = note.file;
     link.download = `${note.title}.pdf`;
+    link.target = "_blank";
     link.click();
-  } catch {
-    alert("Download failed");
-  }
-};
+  };
 
   /* ================= SWIPE ================= */
   const touchStartX = useRef(0);
@@ -163,7 +146,7 @@ const handleDownload = async (note) => {
     if (diff < -80) toggleBookmark(note.id);
   };
 
-  /* ================= TRENDING NOTES ================= */
+  /* ================= TRENDING ================= */
   const trendingNotes = notes
     .filter(
       (n) => (n.download_count || 0) >= 5 || isNewNote(n.created_at)
@@ -173,174 +156,13 @@ const handleDownload = async (note) => {
   /* ================= UI ================= */
   return (
     <div className="notes-page">
-      {/* ===== HEADER ===== */}
       <div className="notes-header">
-        <div>
-          <h2>Notes</h2>
-          <p>Browse and download MCA study materials</p>
-        </div>
+        <h2>Notes</h2>
+        <p>Browse and download MCA study materials</p>
       </div>
 
-      {/* ===== HERO STATS ===== */}
-      <div className="hero-stats">
-        <div className="stat-card">
-          <span className="stat-icon">📚</span>
-          <div>
-            <p className="stat-value">{notes.length}</p>
-            <p className="stat-label">Total Notes</p>
-          </div>
-        </div>
+      {loading && <p>Loading...</p>}
 
-        <div className="stat-card">
-          <span className="stat-icon">⭐</span>
-          <div>
-            <p className="stat-value">{bookmarks.length}</p>
-            <p className="stat-label">Saved</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <span className="stat-icon">🔥</span>
-          <div>
-            <p className="stat-value">
-              {notes.filter((n) => isNewNote(n.created_at)).length}
-            </p>
-            <p className="stat-label">New This Week</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ===== CATEGORY CHIPS ===== */}
-      {subjects.length > 0 && (
-        <div className="category-chips">
-          <button
-            className={!subject ? "chip active" : "chip"}
-            onClick={() => setSubject("")}
-          >
-            All
-          </button>
-
-          {subjects.map((sub) => (
-            <button
-              key={sub.id}
-              className={Number(subject) === sub.id ? "chip active" : "chip"}
-              onClick={() => setSubject(sub.id)}
-            >
-              {sub.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ===== FILTER BAR ===== */}
-      <div className="filters-bar">
-        <input
-          placeholder="Search subject / notes"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <select
-          value={year}
-          onChange={(e) => {
-            setYear(e.target.value);
-            setSemester("");
-            setSubject("");
-          }}
-        >
-          <option value="">Select MCA Year</option>
-          {years.map((y) => (
-            <option key={y.id} value={y.id}>
-              {y.name}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={semester}
-          onChange={(e) => {
-            setSemester(e.target.value);
-            setSubject("");
-          }}
-          disabled={!year}
-        >
-          <option value="">Select Semester</option>
-          {semesters.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          disabled={!semester}
-        >
-          <option value="">
-            {semester ? "Select Subject" : "Select Semester first"}
-          </option>
-          {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>
-              {sub.name}
-            </option>
-          ))}
-        </select>
-
-        <button
-          className="reset-btn"
-          onClick={() => {
-            setSearch("");
-            setYear("");
-            setSemester("");
-            setSubject("");
-          }}
-        >
-          Reset Filters
-        </button>
-      </div>
-
-      {/* ===== LOADING ===== */}
-      {loading && (
-        <div className="skeleton-grid">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton-card"></div>
-          ))}
-        </div>
-      )}
-
-      {!loading && displayNotes.length === 0 && (
-        <div className="empty-state">
-          <h3>No notes found 📂</h3>
-          <p>Try changing filters</p>
-        </div>
-      )}
-
-      {/* ===== TRENDING NOTES ===== */}
-      {!loading && trendingNotes.length > 0 && (
-        <div className="trending-section">
-          <h3>🔥 Trending Notes</h3>
-
-          <div className="trending-grid">
-            {trendingNotes.map((note) => (
-              <div key={note.id} className="trending-card">
-                <h4>{note.title}</h4>
-
-                <p className="trending-meta">
-                  {note.subject.name} • {note.subject.semester.name}
-                </p>
-
-                <div className="trending-actions">
-                  <span>⬇ {note.download_count || 0}</span>
-                  <button onClick={() => handleDownload(note)}>View</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ===== NOTES GRID ===== */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
           <div
@@ -367,17 +189,12 @@ const handleDownload = async (note) => {
               {note.subject.name} • {note.subject.semester.name}
             </p>
 
-           <div className="pdf-preview">
-  📄 PDF Preview
-</div>
-
             <div className="note-actions">
-  <button onClick={() => handleView(note)}>👁 View</button>
-  <button onClick={() => handleDownload(note)}>
-    ⬇ {note.download_count || 0}
-  </button>
-</div>
-
+              <button onClick={() => handleView(note)}>👁 View</button>
+              <button onClick={() => handleDownload(note)}>
+                ⬇ {note.download_count || 0}
+              </button>
+            </div>
           </div>
         ))}
       </div>
