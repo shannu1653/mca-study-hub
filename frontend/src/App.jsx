@@ -13,6 +13,9 @@ import Home from "./pages/Home";
 import Notes from "./pages/Notes";
 import UserDashboard from "./pages/dashboard/UserDashboard";
 
+import Landing from "./pages/Landing";
+
+
 /* ADMIN */
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUpload from "./pages/admin/AdminUpload";
@@ -30,7 +33,7 @@ function App() {
       {/* ================= PUBLIC ================= */}
       <Route
         path="/"
-        element={token ? <Navigate to="/home" replace /> : <Login />}
+        element={token ? <Navigate to="/home" replace /> : <Landing />}
       />
 
       <Route

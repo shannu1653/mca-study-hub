@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
     "axios": "^1.13.2",
+    "framer-motion": "^12.29.2",
     "lucide-react": "^0.323.0",
     "pdf-lib": "^1.17.1",
     "react": "^18.2.0",

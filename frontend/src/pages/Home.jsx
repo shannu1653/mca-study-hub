@@ -10,7 +10,7 @@ const isNewNote = (createdAt) => {
   return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
 };
 
-function Home() {
+export default function Home() {
   const username = localStorage.getItem("username") || "Student";
 
   const [notes, setNotes] = useState([]);
@@ -27,91 +27,120 @@ function Home() {
 
   /* ================= STATS ================= */
   const totalNotes = notes.length;
-
   const totalDownloads = notes.reduce(
     (sum, n) => sum + (n.download_count || 0),
     0
   );
-
-  const newNotesCount = notes.filter((n) =>
-    isNewNote(n.created_at)
-  ).length;
-
-  const savedNotesCount =
+  const newNotes = notes.filter((n) => isNewNote(n.created_at));
+  const savedCount =
     JSON.parse(localStorage.getItem("bookmarks"))?.length || 0;
 
   return (
     <div className="home-page">
+      {/* ================= TOP NAV ================= */}
+      <header className="home-nav">
+        <div className="brand">
+          🎓 <span>MCA Study Hub</span>
+        </div>
+        <div className="nav-actions">
+          <Link to="/notes" className="nav-btn">
+            📘 Notes
+          </Link>
+          <Link to="/dashboard" className="nav-btn outline">
+            📊 Dashboard
+          </Link>
+        </div>
+      </header>
+
       {/* ================= HERO ================= */}
-      <div className="home-hero">
-        <h1>Welcome, {username} 👋</h1>
-        <p>Your MCA study dashboard. Learn smart. Download fast.</p>
+      <section className="home-hero">
+        <h1>
+          Welcome back, <span>{username}</span> 👋
+        </h1>
+        <p>
+          All your MCA study materials, organized and accessible anytime.
+        </p>
 
         <div className="hero-actions">
           <Link to="/notes" className="btn primary">
             📚 Browse Notes
           </Link>
-          <Link to="/notes" className="btn outline">
+          <Link to="/notes?saved=true" className="btn ghost">
             ⭐ Saved Notes
           </Link>
         </div>
-      </div>
+      </section>
 
       {/* ================= STATS ================= */}
-      <div className="home-stats">
+      <section className="home-stats">
         <div className="stat-card">
-          <span>📘</span>
-          <div>
-            <h3>{loading ? "—" : totalNotes}</h3>
-            <p>Total Notes</p>
-          </div>
+          <h3>{loading ? "—" : totalNotes}</h3>
+          <p>Total Notes</p>
         </div>
 
         <div className="stat-card">
-          <span>⬇</span>
-          <div>
-            <h3>{loading ? "—" : totalDownloads}</h3>
-            <p>Total Downloads</p>
-          </div>
+          <h3>{loading ? "—" : totalDownloads}</h3>
+          <p>Total Downloads</p>
+        </div>
+
+        <div className="stat-card highlight">
+          <h3>{loading ? "—" : newNotes.length}</h3>
+          <p>New This Week</p>
         </div>
 
         <div className="stat-card">
-          <span>🆕</span>
-          <div>
-            <h3>{loading ? "—" : newNotesCount}</h3>
-            <p>New This Week</p>
-          </div>
+          <h3>{savedCount}</h3>
+          <p>Saved Notes</p>
         </div>
+      </section>
 
-        <div className="stat-card">
-          <span>⭐</span>
-          <div>
-            <h3>{savedNotesCount}</h3>
-            <p>Saved Notes</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ================= QUICK LINKS ================= */}
-      <div className="quick-links">
-        <h2>Quick Actions</h2>
+      {/* ================= QUICK ACTIONS ================= */}
+      <section className="quick-section">
+        <h2>⚡ Quick Actions</h2>
 
         <div className="quick-grid">
           <Link to="/notes" className="quick-card">
-            📄 View Notes
+            📄 View All Notes
+            <span>Browse by year & subject</span>
           </Link>
 
           <Link to="/notes" className="quick-card">
-            🔥 Trending
+            🔥 Trending Notes
+            <span>Most downloaded</span>
           </Link>
 
           <Link to="/notes" className="quick-card">
-            🆕 New Uploads
+            🆕 Latest Uploads
+            <span>Recently added PDFs</span>
           </Link>
         </div>
-      </div>
+      </section>
+
+      {/* ================= NEW NOTES ================= */}
+      {!loading && newNotes.length > 0 && (
+        <section className="recent-section">
+          <h2>🆕 New Notes</h2>
+
+          <div className="recent-grid">
+            {newNotes.slice(0, 3).map((note) => (
+              <div key={note.id} className="recent-card">
+                <h4>{note.title}</h4>
+                <p>
+                  {note.subject?.name} •{" "}
+                  {note.subject?.semester?.name}
+                </p>
+                <Link to="/notes">View</Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ================= FOOTER ================= */}
+      <footer className="home-footer">
+        <p>© {new Date().getFullYear()} MCA Study Hub</p>
+        <p>Built for students. Designed for focus.</p>
+      </footer>
     </div>
   );
 }
-
-export default Home;
