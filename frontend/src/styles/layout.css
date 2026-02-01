@@ -14,9 +14,10 @@ html, body {
 /* ===== THEME VARIABLES ===== */
 :root {
   --bg: #f5f7fb;
-  --text: #222;
+  --text: #1f2937;
   --card: #ffffff;
   --accent: #2563eb;
+  --muted: #6b7280;
 }
 
 body.dark,
@@ -25,6 +26,7 @@ body.dark,
   --text: #e5e7eb;
   --card: #1e293b;
   --accent: #38bdf8;
+  --muted: #94a3b8;
 }
 
 /* ================= LAYOUT ================= */
@@ -37,42 +39,40 @@ body.dark,
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  width: 100vh !important;
+  width: 240px;              /* ✅ FIXED WIDTH */
+  min-width: 240px;
   background: var(--card);
-  padding: 20px;
+  padding: 24px 18px;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
   flex-shrink: 0;
 }
 
 .sidebar h2 {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 700;
 }
 
-/* 🔑 IMPORTANT: FORCE SIDEBAR LINKS TO SHOW */
+/* NAV */
 .sidebar nav {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.sidebar nav a:not(.active):not(.dashboard-link) {
-  opacity: 0.85;
-}
-
 .sidebar nav a {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 
-  padding: 10px 12px;
-  margin-bottom: 8px;
+  padding: 12px 14px;
   text-decoration: none;
 
   color: var(--text);
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 500;
 
-  transition: background 0.25s ease, transform 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 /* HOVER */
@@ -82,17 +82,28 @@ body.dark,
   transform: translateX(4px);
 }
 
-/* ACTIVE (THIS IS WHAT YOU NEED) */
+/* ACTIVE */
 .sidebar nav a.active {
   background: var(--accent);
   color: #fff;
   font-weight: 600;
 }
 
+/* SECTION LABEL */
+.nav-section {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 18px 0 8px;
+  letter-spacing: 0.06em;
+}
+
 /* ================= MAIN ================= */
 .main {
-  flex: 1;
-  padding: 20px;
+  flex: 1;                   /* ✅ TAKE REMAINING SPACE */
+  padding: 24px;
+  overflow-x: hidden;
 }
 
 /* ================= TOP BAR ================= */
@@ -100,14 +111,15 @@ body.dark,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .topbar input {
-  padding: 8px 12px;
-  width: 220px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 10px 14px;
+  width: 240px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
 }
 
 /* ================= TOP ACTIONS ================= */
@@ -117,13 +129,23 @@ body.dark,
   gap: 12px;
 }
 
+/* HOME BUTTON */
+.dashboard-quick-btn {
+  background: var(--accent);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
 /* ================= SAVED NOTES ================= */
 .saved-pill {
   display: flex;
   align-items: center;
   gap: 6px;
   background: #eef2ff;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   font-weight: 600;
 }
@@ -139,7 +161,7 @@ body.dark,
 /* ================= BUTTONS ================= */
 .top-actions button {
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
 }
@@ -150,8 +172,7 @@ body.dark,
   color: #fff;
   min-width: 96px;
   padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -168,6 +189,10 @@ body.dark,
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
   }
 
   .desktop-only {
@@ -213,8 +238,8 @@ body.dark,
     background: none;
     border: none;
     color: var(--text);
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
   }
 
   .bottom-nav span {
@@ -227,41 +252,7 @@ body.dark,
     font-weight: 600;
   }
 
-  /* Prevent content hidden */
   .main {
     padding-bottom: 90px;
   }
-}
-.dashboard-quick-btn {
-  background: #2563eb;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-}
-/* ================= DASHBOARD SPECIAL ================= */
-.dashboard-link {
-  background: rgba(37, 99, 235, 0.08);
-  border-left: 4px solid var(--accent);
-}
-
-.dashboard-link:hover {
-  background: var(--accent);
-  color: #fff;
-}
-
-.sidebar nav a.dashboard-link.active {
-  background: var(--accent);
-  color: #fff;
-  border-left: 4px solid #1e40af;
-}
-/* ================= SIDEBAR SECTIONS ================= */
-.nav-section {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin: 16px 0 8px;
-  letter-spacing: 0.06em;
 }

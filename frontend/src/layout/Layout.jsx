@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import "../styles/layout.css";
+import { FiHome } from "react-icons/fi";
+
 
 function Layout() {
   const navigate = useNavigate();
@@ -50,40 +52,49 @@ function Layout() {
         <h2 className="logo">MCA Study</h2>
 
         <nav>
-          {!isAdmin && (
-            <Link
-              to="/dashboard"
-              className={isActive("/dashboard") ? "active" : ""}
-            >
-              📊 Dashboard
-            </Link>
-          )}
+  {/* 🏠 HOME */}
+  <Link
+    to="/home"
+    className={isActive("/home") ? "active" : ""}
+  >
+    🏠 Home
+  </Link>
 
-          <Link
-            to="/notes"
-            className={isActive("/notes") ? "active" : ""}
-          >
-            📘 Notes
-          </Link>
+  {!isAdmin && (
+    <Link
+      to="/dashboard"
+      className={isActive("/dashboard") ? "active" : ""}
+    >
+      📊 Dashboard
+    </Link>
+  )}
 
-          {isAdmin && (
-            <>
-              <Link
-                to="/admin"
-                className={isActive("/admin") ? "active" : ""}
-              >
-                🛠 Admin
-              </Link>
+  <Link
+    to="/notes"
+    className={isActive("/notes") ? "active" : ""}
+  >
+    📘 Notes
+  </Link>
 
-              <Link
-                to="/admin/upload"
-                className={isActive("/admin/upload") ? "active" : ""}
-              >
-                ⬆ Upload
-              </Link>
-            </>
-          )}
-        </nav>
+  {isAdmin && (
+    <>
+      <Link
+        to="/admin"
+        className={isActive("/admin") ? "active" : ""}
+      >
+        🛠 Admin Dashboard
+      </Link>
+
+      <Link
+        to="/admin/upload"
+        className={isActive("/admin/upload") ? "active" : ""}
+      >
+        ⬆ Upload Notes
+      </Link>
+    </>
+  )}
+</nav>
+
       </aside>
 
       {/* ================= MAIN ================= */}
@@ -93,7 +104,11 @@ function Layout() {
             <Link to="/dashboard" className="dashboard-quick-btn">
               📊 Go to Dashboard
             </Link>
+            
           )}
+          <Link to="/home" className="dashboard-quick-btn">
+  🏠 Home
+</Link>
 
           <div className="top-actions">
             <div className="saved-pill">
