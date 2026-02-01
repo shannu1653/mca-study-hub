@@ -207,11 +207,11 @@ class NoteDetailView(RetrieveUpdateDestroyAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def increase_download(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+    try:
+        note = Note.objects.get(pk=pk)
+        note.download_count += 1
+        note.save()
+        return Response({"success": True, "count": note.download_count})
+    except Note.DoesNotExist:
+        return Response({"error": "Note not found"}, status=404)
 
-    # Safe increment
-    if hasattr(note, "download_count"):
-        note.download_count = (note.download_count or 0) + 1
-        note.save(update_fields=["download_count"])
-
-    return Response({"success": True}, status=status.HTTP_200_OK)

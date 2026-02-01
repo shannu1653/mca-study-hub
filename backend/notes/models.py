@@ -33,20 +33,10 @@ class Subject(models.Model):
 
 
 class Note(models.Model):
-    subject = models.ForeignKey(
-        Subject,
-        on_delete=models.CASCADE,
-        related_name="notes"
-    )
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="notes")
     title = models.CharField(max_length=255)
-
-    # 🔥 SUPABASE PDF URL
     pdf_url = models.URLField()
-
-    # 🔥 REQUIRED FOR TRENDING + DOWNLOAD
-    download_count = models.PositiveIntegerField(default=0)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.title
+    download_count = models.PositiveIntegerField(default=0)  # ✅ REQUIRED
+
