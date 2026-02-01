@@ -6,27 +6,26 @@ from .views import (
     SemesterListCreateView,
     SemesterDeleteView,
     SubjectListCreateView,
-    SubjectDeleteView,NoteDetailView,increase_download,
+    SubjectDeleteView,
+    NoteDetailView,
+    increase_download,
 )
 
-
 urlpatterns = [
-    # Notes (GET = users, POST = admin)
-    path("", NotesView.as_view()),
+    # ================= NOTES =================
+    path("", NotesView.as_view()),                 # GET, POST
+    path("<int:pk>/", NoteDetailView.as_view()),   # GET, PUT, DELETE
+    path("<int:pk>/download/", increase_download),# POST
 
-    # Years
+    # ================= YEARS =================
     path("years/", YearListCreateView.as_view()),
     path("years/<int:pk>/", YearDeleteView.as_view()),
 
-    # Semesters
+    # ================= SEMESTERS =================
     path("semesters/", SemesterListCreateView.as_view()),
     path("semesters/<int:pk>/", SemesterDeleteView.as_view()),
 
-    # Subjects
+    # ================= SUBJECTS =================
     path("subjects/", SubjectListCreateView.as_view()),
     path("subjects/<int:pk>/", SubjectDeleteView.as_view()),
-   path("<int:pk>/", NoteDetailView.as_view()),
-   path("notes/<int:pk>/download/", increase_download),
-
-
 ]

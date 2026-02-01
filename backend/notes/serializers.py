@@ -1,16 +1,19 @@
 from rest_framework import serializers
 from .models import Year, Semester, Subject, Note
 
-
-# =====================
-# BASIC SERIALIZERS (Admin / Dropdowns)
-# =====================
+# ==================================================
+# YEAR
+# ==================================================
 
 class YearSerializer(serializers.ModelSerializer):
     class Meta:
         model = Year
         fields = ["id", "name"]
 
+
+# ==================================================
+# SEMESTER
+# ==================================================
 
 class SemesterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,23 +26,23 @@ class SemesterSerializer(serializers.ModelSerializer):
         return value
 
 
-from rest_framework import serializers
-from .models import Subject
-
+# ==================================================
+# SUBJECT
+# ==================================================
 
 class SubjectSerializer(serializers.ModelSerializer):
     semester = serializers.PrimaryKeyRelatedField(
-        queryset=Subject._meta.get_field('semester').remote_field.model.objects.all()
+        queryset=Semester.objects.all()
     )
 
     class Meta:
         model = Subject
-        fields = ["id", "semester", "name"]
+        fields = ["id", "name", "semester"]
 
 
-# =====================
-# NESTED SERIALIZERS (Notes Page)
-# =====================
+# ==================================================
+# NESTED DISPLAY SERIALIZERS (FOR NOTES PAGE)
+# ==================================================
 
 class SemesterDetailSerializer(serializers.ModelSerializer):
     year = YearSerializer(read_only=True)
@@ -57,19 +60,39 @@ class SubjectDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "semester"]
 
 
+# ==================================================
+# NOTE (READ – FRONTEND)
+# ==================================================
+
 class NoteSerializer(serializers.ModelSerializer):
     subject = SubjectDetailSerializer(read_only=True)
 
+    # 🔥 THIS IS WHAT FRONTEND USES
+    file = serializers.CharField(source="pdf_url", read_only=True)
+
     class Meta:
         model = Note
-        fields = ["id", "title", "pdf_url", "created_at", "subject"]
+        fields = [
+            "id",
+            "title",
+            "file",          # frontend opens this
+            "pdf_url",       # optional (admin/debug)
+            "created_at",
+            "subject",
+            "download_count",
+        ]
 
 
-# =====================
-# NOTE CREATE (UPLOAD)
-# =====================
+# ==================================================
+# NOTE CREATE / UPDATE (ADMIN)
+# ==================================================
 
 class NoteCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ["subject", "title", "pdf_url"]
+        fields = [
+            "id",
+            "title",
+            "pdf_url",
+            "subject",
+        ]

@@ -1,8 +1,14 @@
 from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView, DestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    DestroyAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from django.shortcuts import get_object_or_404
 
 from .models import Note, Year, Semester, Subject
 from .serializers import (
@@ -13,20 +19,26 @@ from .serializers import (
     SubjectSerializer,
 )
 
-# ================= NOTES =================
+# =====================================================
+# NOTES
+# =====================================================
 
 class NotesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        notes = Note.objects.select_related(
-            "subject",
-            "subject__semester",
-            "subject__semester__year"
-        ).order_by("-created_at")
+        notes = (
+            Note.objects
+            .select_related(
+                "subject",
+                "subject__semester",
+                "subject__semester__year"
+            )
+            .order_by("-created_at")
+        )
 
         serializer = NoteSerializer(notes, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if not request.user.is_staff:
@@ -46,7 +58,9 @@ class NotesView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ================= YEARS =================
+# =====================================================
+# YEARS
+# =====================================================
 
 class YearListCreateView(ListCreateAPIView):
     queryset = Year.objects.all()
@@ -76,12 +90,20 @@ class YearDeleteView(DestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-# ================= SEMESTERS =================
+# =====================================================
+# SEMESTERS
+# =====================================================
 
 class SemesterListCreateView(ListCreateAPIView):
-    queryset = Semester.objects.all()
     serializer_class = SemesterSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        year_id = self.request.query_params.get("year")
+        qs = Semester.objects.all()
+        if year_id:
+            qs = qs.filter(year_id=year_id)
+        return qs
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
@@ -90,16 +112,13 @@ class SemesterListCreateView(ListCreateAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        year_id = request.data.get("year")
-        name = request.data.get("name")
-
-        if not year_id:
+        if not request.data.get("year"):
             return Response(
                 {"error": "year is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if not name:
+        if not request.data.get("name"):
             return Response(
                 {"error": "semester name is required"},
                 status=status.HTTP_400_BAD_REQUEST
@@ -122,12 +141,20 @@ class SemesterDeleteView(DestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-# ================= SUBJECTS =================
+# =====================================================
+# SUBJECTS
+# =====================================================
 
 class SubjectListCreateView(ListCreateAPIView):
-    queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        semester_id = self.request.query_params.get("semester")
+        qs = Subject.objects.all()
+        if semester_id:
+            qs = qs.filter(semester_id=semester_id)
+        return qs
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
@@ -135,12 +162,7 @@ class SubjectListCreateView(ListCreateAPIView):
                 {"detail": "Only admin can add subject"},
                 status=status.HTTP_403_FORBIDDEN
             )
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return super().post(request, *args, **kwargs)
 
 
 class SubjectDeleteView(DestroyAPIView):
@@ -157,14 +179,16 @@ class SubjectDeleteView(DestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+# =====================================================
+# NOTE DETAIL (VIEW / UPDATE / DELETE)
+# =====================================================
 
 class NoteDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = Note.objects.all()
-    serializer_class = NoteCreateSerializer
+    queryset = (
+        Note.objects
+        .select_related("subject__semester__year")
+    )
+    serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -176,14 +200,18 @@ class NoteDetailView(RetrieveUpdateDestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+# =====================================================
+# DOWNLOAD COUNT (NO FILE SERVING)
+# =====================================================
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def increase_download(request, pk):
-    note = Note.objects.get(pk=pk)
-    note.download_count += 1
-    note.save()
-    return Response({"success": True})
+    note = get_object_or_404(Note, pk=pk)
+
+    # Safe increment
+    if hasattr(note, "download_count"):
+        note.download_count = (note.download_count or 0) + 1
+        note.save(update_fields=["download_count"])
+
+    return Response({"success": True}, status=status.HTTP_200_OK)
