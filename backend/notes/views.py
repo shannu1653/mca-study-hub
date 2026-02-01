@@ -7,20 +7,17 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-from django.shortcuts import get_object_or_404
 
 from .models import Note, Year, Semester, Subject
 from .serializers import (
     NoteSerializer,
-    NoteCreateSerializer,
     YearSerializer,
     SemesterSerializer,
     SubjectSerializer,
 )
 
 # =====================================================
-# NOTES
+# NOTES (LIST + CREATE)
 # =====================================================
 
 class NotesView(APIView):
@@ -36,7 +33,6 @@ class NotesView(APIView):
             )
             .order_by("-created_at")
         )
-
         serializer = NoteSerializer(notes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -47,15 +43,31 @@ class NotesView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        serializer = NoteCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"message": "Note uploaded successfully"},
-                status=status.HTTP_201_CREATED
-            )
+        serializer = NoteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"message": "Note uploaded successfully"},
+            status=status.HTTP_201_CREATED
+        )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# =====================================================
+# NOTE DETAIL (VIEW / UPDATE / DELETE)
+# =====================================================
+
+class NoteDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().delete(request, *args, **kwargs)
 
 
 # =====================================================
@@ -69,10 +81,7 @@ class YearListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Admin only"}, status=403)
         return super().post(request, *args, **kwargs)
 
 
@@ -83,10 +92,7 @@ class YearDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Admin only"}, status=403)
         return super().delete(request, *args, **kwargs)
 
 
@@ -107,23 +113,7 @@ class SemesterListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        if not request.data.get("year"):
-            return Response(
-                {"error": "year is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if not request.data.get("name"):
-            return Response(
-                {"error": "semester name is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+            return Response({"detail": "Admin only"}, status=403)
         return super().post(request, *args, **kwargs)
 
 
@@ -134,10 +124,7 @@ class SemesterDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Admin only"}, status=403)
         return super().delete(request, *args, **kwargs)
 
 
@@ -158,10 +145,7 @@ class SubjectListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Only admin can add subject"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Admin only"}, status=403)
         return super().post(request, *args, **kwargs)
 
 
@@ -172,46 +156,5 @@ class SubjectDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Admin only"}, status=403)
         return super().delete(request, *args, **kwargs)
-
-
-# =====================================================
-# NOTE DETAIL (VIEW / UPDATE / DELETE)
-# =====================================================
-
-class NoteDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = (
-        Note.objects
-        .select_related("subject__semester__year")
-    )
-    serializer_class = NoteSerializer
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            return Response(
-                {"detail": "Admin only"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        return super().delete(request, *args, **kwargs)
-
-
-# =====================================================
-# DOWNLOAD COUNT (NO FILE SERVING)
-# =====================================================
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def increase_download(request, pk):
-    try:
-        note = Note.objects.get(pk=pk)
-        note.download_count += 1
-        note.save()
-        return Response({"success": True, "count": note.download_count})
-    except Note.DoesNotExist:
-        return Response({"error": "Note not found"}, status=404)
-

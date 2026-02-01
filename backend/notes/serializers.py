@@ -38,28 +38,19 @@ class SubjectDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "semester"]
 
 
-# ================= NOTE (MAIN – FRONTEND USES THIS) =================
 class NoteSerializer(serializers.ModelSerializer):
     subject = SubjectDetailSerializer(read_only=True)
 
-    # 🔥 VERY IMPORTANT
-    file = serializers.URLField(source="pdf_url", read_only=True)
+    # frontend uses `note.file`
+    file = serializers.CharField(source="pdf_url", read_only=True)
 
     class Meta:
         model = Note
         fields = [
             "id",
             "title",
-            "file",          # frontend uses this
-            "pdf_url",       # optional
+            "file",          # ✅ REQUIRED
             "created_at",
-            "download_count",
             "subject",
+            "download_count",
         ]
-
-
-# ================= NOTE CREATE (ADMIN) =================
-class NoteCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Note
-        fields = ["id", "title", "pdf_url", "subject"]
