@@ -107,30 +107,22 @@ function Notes() {
   };
 
   /* ================= VIEW ================= */
-  /* ================= VIEW PDF ================= */
-const handleView = async (note) => {
-  try {
-    const res = await api.get(`notes/${note.id}/`, {
-      responseType: "blob",
-    });
-
-    const fileURL = URL.createObjectURL(
-      new Blob([res.data], { type: "application/pdf" })
-    );
-
-    window.open(fileURL);
-  } catch (err) {
-    alert("Unable to open PDF");
-    console.error(err);
+ /* ================= VIEW PDF ================= */
+const handleView = (note) => {
+  if (!note.file) {
+    alert("PDF not available");
+    return;
   }
+  window.open(note.file, "_blank");
 };
 
 /* ================= DOWNLOAD PDF ================= */
 const handleDownload = async (note) => {
   try {
-    const res = await api.get(`notes/${note.id}/download/`, {
-      responseType: "blob",
-    });
+    const res = await api.get(
+      `notes/notes/${note.id}/download/`,
+      { responseType: "blob" }
+    );
 
     const url = URL.createObjectURL(
       new Blob([res.data], { type: "application/pdf" })
@@ -145,6 +137,7 @@ const handleDownload = async (note) => {
     console.error(err);
   }
 };
+
 
 
 
