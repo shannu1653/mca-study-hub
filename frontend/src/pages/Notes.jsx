@@ -6,91 +6,75 @@ import "../styles/notes.css";
 const isNewNote = (createdAt) => {
   const noteDate = new Date(createdAt);
   const now = new Date();
-  const diffDays = (now - noteDate) / (1000 * 60 * 60 * 24);
-  return diffDays <= 7;
+  return (now - noteDate) / (1000 * 60 * 60 * 24) <= 7;
 };
 
-/* ================= NOTES PAGE ================= */
 function Notes() {
-  /* ================= DATA ================= */
+  /* ================= STATE ================= */
   const [notes, setNotes] = useState([]);
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* ================= FILTERS ================= */
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("");
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
 
-  /* ================= BOOKMARKS ================= */
   const [bookmarks, setBookmarks] = useState(
     JSON.parse(localStorage.getItem("bookmarks")) || []
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  /* ================= FETCH NOTES ================= */
+  /* ================= FETCH DATA ================= */
   useEffect(() => {
-    fetchAll();
-  }, []);
-
-  const fetchAll = async () => {
-    try {
-      const [notesRes, yearsRes] = await Promise.all([
-        api.get("notes/"),
-        api.get("notes/years/"),
-      ]);
-      setNotes(notesRes.data);
-      setYears(yearsRes.data);
-    } catch (error) {
-      if (error.response?.status === 401) {
+    Promise.all([
+      api.get("notes/"),
+      api.get("notes/years/"),
+    ])
+      .then(([notesRes, yearsRes]) => {
+        setNotes(notesRes.data || []);
+        setYears(yearsRes.data || []);
+      })
+      .catch(() => {
         localStorage.clear();
         window.location.href = "/login";
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  /* ================= FETCH SEMESTERS ================= */
+  /* ================= SEMESTERS ================= */
   useEffect(() => {
     if (!year) {
       setSemesters([]);
-      setSemester("");
       return;
     }
-
     api
       .get(`notes/semesters/?year=${year}`)
-      .then((res) => setSemesters(res.data))
+      .then((res) => setSemesters(res.data || []))
       .catch(() => setSemesters([]));
   }, [year]);
 
-  /* ================= FETCH SUBJECTS ================= */
+  /* ================= SUBJECTS ================= */
   useEffect(() => {
     if (!semester) {
       setSubjects([]);
-      setSubject("");
       return;
     }
-
     api
       .get(`notes/subjects/?semester=${semester}`)
-      .then((res) => setSubjects(res.data))
+      .then((res) => setSubjects(res.data || []))
       .catch(() => setSubjects([]));
   }, [semester]);
 
-  /* ================= FILTER NOTES ================= */
-  const filteredNotes = notes.filter((note) => {
-    return (
-      note.title.toLowerCase().includes(search.toLowerCase()) &&
-      (!year || note.subject.semester.year.id === Number(year)) &&
-      (!semester || note.subject.semester.id === Number(semester)) &&
-      (!subject || note.subject.id === Number(subject))
-    );
-  });
+  /* ================= FILTER ================= */
+  const filteredNotes = notes.filter((n) =>
+    n.title.toLowerCase().includes(search.toLowerCase()) &&
+    (!year || n.subject.semester.year.id === Number(year)) &&
+    (!semester || n.subject.semester.id === Number(semester)) &&
+    (!subject || n.subject.id === Number(subject))
+  );
 
   const displayNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
@@ -106,48 +90,39 @@ function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW ================= */
- /* ================= VIEW PDF ================= */
-const handleView = (note) => {
-  if (!note.file) {
-    alert("PDF not available");
-    return;
-  }
-  window.open(note.file, "_blank");
-};
+  /* ================= VIEW PDF ================= */
+  const handleView = (note) => {
+    if (!note.file) {
+      alert("PDF not available");
+      return;
+    }
+    window.open(note.file, "_blank");
+  };
 
-/* ================= DOWNLOAD PDF ================= */
-const handleDownload = async (note) => {
-  try {
-    const res = await api.get(
-      `notes/notes/${note.id}/download/`,
-      { responseType: "blob" }
-    );
+  /* ================= DOWNLOAD PDF ================= */
+  const handleDownload = async (note) => {
+    try {
+      // increase count only
+      await api.post(`notes/notes/${note.id}/download/`);
+    } catch {
+      console.warn("Download count update failed");
+    }
 
-    const url = URL.createObjectURL(
-      new Blob([res.data], { type: "application/pdf" })
-    );
+    if (!note.file) {
+      alert("PDF not available");
+      return;
+    }
 
     const link = document.createElement("a");
-    link.href = url;
+    link.href = note.file;
     link.download = `${note.title}.pdf`;
+    link.target = "_blank";
     link.click();
-  } catch (err) {
-    alert("Download failed");
-    console.error(err);
-  }
-};
-
-
-
+  };
 
   /* ================= SWIPE ================= */
   const touchStartX = useRef(0);
-
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
+  const onTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
   const onTouchEnd = (e, note) => {
     const diff = e.changedTouches[0].clientX - touchStartX.current;
     if (diff > 80) handleDownload(note);
@@ -164,50 +139,13 @@ const handleDownload = async (note) => {
   /* ================= UI ================= */
   return (
     <div className="notes-page">
-      {/* HEADER */}
-      <div className="notes-header">
-        <h2>Notes</h2>
-        <p>Browse and download MCA study materials</p>
-      </div>
+      <h2>Notes</h2>
+      <p>Browse and download MCA study materials</p>
 
-      {/* HERO STATS */}
-      <div className="hero-stats">
-        <div className="stat-card">
-          <span>📚</span>
-          <div>
-            <p className="stat-value">{notes.length}</p>
-            <p>Total Notes</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <span>⭐</span>
-          <div>
-            <p className="stat-value">{bookmarks.length}</p>
-            <p>Saved</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <span>🔥</span>
-          <div>
-            <p className="stat-value">
-              {notes.filter((n) => isNewNote(n.created_at)).length}
-            </p>
-            <p>New This Week</p>
-          </div>
-        </div>
-      </div>
-
-      {/* SAVED TOGGLE */}
-      <button
-        className="saved-toggle"
-        onClick={() => setShowSaved(!showSaved)}
-      >
+      <button onClick={() => setShowSaved(!showSaved)}>
         {showSaved ? "Show All Notes" : "Show Saved"}
       </button>
 
-      {/* FILTER BAR */}
       <div className="filters-bar">
         <input
           placeholder="Search notes"
@@ -218,9 +156,7 @@ const handleDownload = async (note) => {
         <select value={year} onChange={(e) => setYear(e.target.value)}>
           <option value="">Select MCA Year</option>
           {years.map((y) => (
-            <option key={y.id} value={y.id}>
-              {y.name}
-            </option>
+            <option key={y.id} value={y.id}>{y.name}</option>
           ))}
         </select>
 
@@ -231,9 +167,7 @@ const handleDownload = async (note) => {
         >
           <option value="">Select Semester</option>
           {semesters.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
+            <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
 
@@ -244,17 +178,13 @@ const handleDownload = async (note) => {
         >
           <option value="">Select Subject</option>
           {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>
-              {sub.name}
-            </option>
+            <option key={sub.id} value={sub.id}>{sub.name}</option>
           ))}
         </select>
       </div>
 
-      {/* LOADING */}
       {loading && <p>Loading...</p>}
 
-      {/* TRENDING */}
       {!loading && trendingNotes.length > 0 && (
         <div className="trending-section">
           <h3>🔥 Trending Notes</h3>
@@ -262,9 +192,7 @@ const handleDownload = async (note) => {
             {trendingNotes.map((note) => (
               <div key={note.id} className="trending-card">
                 <h4>{note.title}</h4>
-                <p>
-                  {note.subject.name} • {note.subject.semester.name}
-                </p>
+                <p>{note.subject.name} • {note.subject.semester.name}</p>
                 <button onClick={() => handleView(note)}>View</button>
               </div>
             ))}
@@ -272,7 +200,6 @@ const handleDownload = async (note) => {
         </div>
       )}
 
-      {/* NOTES GRID */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
           <div
@@ -281,14 +208,10 @@ const handleDownload = async (note) => {
             onTouchStart={onTouchStart}
             onTouchEnd={(e) => onTouchEnd(e, note)}
           >
-            {isNewNote(note.created_at) && (
-              <span className="new-badge">NEW</span>
-            )}
+            {isNewNote(note.created_at) && <span className="new-badge">NEW</span>}
 
             <h3>{note.title}</h3>
-            <p>
-              {note.subject.name} • {note.subject.semester.name}
-            </p>
+            <p>{note.subject.name} • {note.subject.semester.name}</p>
 
             <div className="note-actions">
               <button onClick={() => handleView(note)}>👁 View</button>
