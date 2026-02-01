@@ -1,33 +1,31 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
 
+  resolve: {
+    // 🔑 VERY IMPORTANT: force single React instance
+    dedupe: ["react", "react-dom"],
+  },
+
   build: {
-    // Increase limit AFTER proper code splitting
     chunkSizeWarningLimit: 1000,
 
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // React core
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
-            return "react";
-          }
-
-          // PDF related (very heavy)
+          // 📄 PDF related (heavy)
           if (id.includes("pdf")) {
             return "pdf";
           }
 
-          // Axios / fetch libs
+          // 🌐 Axios & common vendors
           if (id.includes("axios")) {
             return "vendor";
           }
 
-          // All remaining node_modules
+          // 📦 All remaining node_modules
           if (id.includes("node_modules")) {
             return "vendor";
           }
