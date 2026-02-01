@@ -128,7 +128,7 @@ const handleView = async (note) => {
 /* ================= DOWNLOAD PDF ================= */
 const handleDownload = async (note) => {
   try {
-    const res = await api.get(`notes/notes/${note.id}/download/`, {
+    const res = await api.get(`notes/${note.id}/download/`, {
       responseType: "blob",
     });
 
@@ -145,6 +145,7 @@ const handleDownload = async (note) => {
     console.error(err);
   }
 };
+
 
 
   /* ================= SWIPE ================= */
