@@ -12,13 +12,32 @@ body {
 }
 
 /* 🌐 ROOT */
+
+/* 🌐 ROOT (LIGHT MODE) */
 :root {
   --primary: #2563eb;
   --primary-dark: #1e40af;
+
   --bg: #f5f7fb;
+  --card: #ffffff;
   --text: #1f2937;
+  --muted-text: #6b7280;
+
   --border: #d1d5db;
   --radius: 10px;
+}
+
+/* 🌙 DARK MODE */
+[data-theme="dark"] {
+  --primary: #38bdf8;
+  --primary-dark: #0ea5e9;
+
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e5e7eb;
+  --muted-text: #94a3b8;
+
+  --border: #334155;
 }
 
 /* 🧠 BODY */
