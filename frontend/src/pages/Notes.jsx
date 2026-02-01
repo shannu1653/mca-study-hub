@@ -116,7 +116,25 @@ function Notes() {
   const handleDownload = async (note) => {
     try {
       // increase download count
-      await api.post(`notes/notes/${note.id}/download/`);
+      const handleDownload = async (note) => {
+  try {
+    // hit backend to increase count (CORRECT URL + GET)
+    await api.get(`notes/${note.id}/download/`);
+  } catch (err) {
+    console.warn("Download count failed");
+  }
+
+  if (!note.file) {
+    alert("File not available");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = note.file;
+  link.download = `${note.title}.pdf`;
+  link.target = "_blank";
+  link.click();
+};
     } catch {
       console.warn("Download count failed");
     }
