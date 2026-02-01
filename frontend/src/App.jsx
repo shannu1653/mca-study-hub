@@ -1,20 +1,24 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+/* AUTH */
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 
+/* ROUTES */
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
+
+/* LAYOUT */
 import Layout from "./layout/Layout";
+
+/* PUBLIC */
+import Landing from "./pages/Landing";
 
 /* USER */
 import Home from "./pages/Home";
 import Notes from "./pages/Notes";
 import UserDashboard from "./pages/dashboard/UserDashboard";
-
-import Landing from "./pages/Landing";
-
 
 /* ADMIN */
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -30,7 +34,7 @@ function App() {
 
   return (
     <Routes>
-      {/* ================= PUBLIC ================= */}
+      {/* ================= LANDING / PUBLIC ================= */}
       <Route
         path="/"
         element={token ? <Navigate to="/home" replace /> : <Landing />}
@@ -48,7 +52,7 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* ================= USER ================= */}
+      {/* ================= USER ROUTES ================= */}
       <Route
         element={
           <ProtectedRoute>
@@ -61,7 +65,7 @@ function App() {
         <Route path="/notes" element={<Notes />} />
       </Route>
 
-      {/* ================= ADMIN ================= */}
+      {/* ================= ADMIN ROUTES ================= */}
       <Route
         element={
           <AdminRoute>
@@ -81,7 +85,11 @@ function App() {
       <Route
         path="*"
         element={
-          token ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
+          token ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
         }
       />
     </Routes>
