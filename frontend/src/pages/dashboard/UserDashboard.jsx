@@ -63,7 +63,8 @@ export default function UserDashboard() {
 
   return (
     <div className="user-dashboard">
-      <h2 className="dashboard-title">Dashboard</h2>
+      <h2 className="dashboard-title">Overview</h2>
+
 
       {/* ===== STATS ===== */}
       <div className="stats-grid">

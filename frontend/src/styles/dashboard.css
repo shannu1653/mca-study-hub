@@ -193,3 +193,7 @@
 .fade-item {
   animation: fadeUp 0.4s ease;
 }
+.user-dashboard {
+  min-height: auto;   /* not full page */
+  padding-bottom: 24px;
+}

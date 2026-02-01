@@ -2,17 +2,17 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Notes from "./pages/Notes";
 import ForgotPassword from "./pages/ForgotPassword";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
 import Layout from "./layout/Layout";
 
-/* User */
-import UserDashboard from "./pages/dashboard/UserDashboard";
+/* USER */
+import Home from "./pages/Home";
+import Notes from "./pages/Notes";
 
-/* Admin */
+/* ADMIN */
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUpload from "./pages/admin/AdminUpload";
 import ManageYears from "./pages/admin/ManageYears";
@@ -29,29 +29,29 @@ function App() {
       {/* ================= PUBLIC ================= */}
       <Route
         path="/"
-        element={token ? <Navigate to="/notes" replace /> : <Login />}
+        element={token ? <Navigate to="/home" replace /> : <Login />}
       />
 
       <Route
         path="/login"
-        element={token ? <Navigate to="/notes" replace /> : <Login />}
+        element={token ? <Navigate to="/home" replace /> : <Login />}
       />
 
       <Route
         path="/register"
-        element={token ? <Navigate to="/notes" replace /> : <Register />}
+        element={token ? <Navigate to="/home" replace /> : <Register />}
       />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* ================= USER ================= */}
       <Route
-        path="/dashboard"
+        path="/home"
         element={
           <ProtectedRoute>
             {!isAdmin ? (
               <Layout>
-                <UserDashboard />
+                <Home />
               </Layout>
             ) : (
               <Navigate to="/admin" replace />
@@ -142,7 +142,7 @@ function App() {
       <Route
         path="*"
         element={
-          token ? <Navigate to="/notes" replace /> : <Navigate to="/login" replace />
+          token ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
         }
       />
     </Routes>
