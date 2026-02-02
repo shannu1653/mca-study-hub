@@ -34,7 +34,7 @@ function App() {
 
   return (
     <Routes>
-      {/* ================= LANDING / PUBLIC ================= */}
+      {/* ================= PUBLIC ================= */}
       <Route
         path="/"
         element={token ? <Navigate to="/home" replace /> : <Landing />}
@@ -52,20 +52,32 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* ================= USER ROUTES ================= */}
+      {/* ================= SHARED (USER + ADMIN) ================= */}
       <Route
         element={
           <ProtectedRoute>
-            {!isAdmin ? <Layout /> : <Navigate to="/admin" replace />}
+            <Layout />
           </ProtectedRoute>
         }
       >
         <Route path="/home" element={<Home />} />
-        <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/notes" element={<Notes />} />
       </Route>
 
-      {/* ================= ADMIN ROUTES ================= */}
+      {/* ================= USER ONLY ================= */}
+      {!isAdmin && (
+        <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<UserDashboard />} />
+        </Route>
+      )}
+
+      {/* ================= ADMIN ONLY ================= */}
       <Route
         element={
           <AdminRoute>
@@ -85,11 +97,7 @@ function App() {
       <Route
         path="*"
         element={
-          token ? (
-            <Navigate to="/home" replace />
-          ) : (
-            <Navigate to="/" replace />
-          )
+          token ? <Navigate to="/home" replace /> : <Navigate to="/" replace />
         }
       />
     </Routes>
