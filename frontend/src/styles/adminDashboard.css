@@ -1,20 +1,36 @@
-/* 🌟 ADMIN DASHBOARD – PREMIUM EDITION */
+/* 🌟 ADMIN DASHBOARD – PREMIUM (FIXED & POLISHED) */
+
+/* ================= PAGE ================= */
 
 .admin-dashboard {
-  padding: 28px;
-  min-height: 100vh;
-  background:
-    linear-gradient(135deg, #f8fafc, #eef2ff);
-  animation: pageFade 0.45s ease both;
+  padding: 24px;
+  min-height: 100%;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  animation: pageFade 0.4s ease both;
+}
+
+/* Optional header (safe even if unused) */
+.admin-header {
+  margin-bottom: 18px;
+}
+
+.admin-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.admin-header p {
+  font-size: 14px;
+  opacity: 0.75;
 }
 
 /* ================= GRID ================= */
 
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 22px;
-  margin-top: 26px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
 }
 
 /* ================= CARD ================= */
@@ -23,44 +39,50 @@
   position: relative;
   isolation: isolate;
 
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  padding: 26px 22px;
-  border-radius: 18px;
+  padding: 22px;
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
   text-align: center;
   font-weight: 600;
   font-size: 15px;
   color: #1f2937;
 
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   text-decoration: none;
   cursor: pointer;
 
-  box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
 
   transition:
-    transform 0.35s cubic-bezier(.4,0,.2,1),
-    box-shadow 0.35s ease,
-    background 0.45s ease,
-    color 0.3s ease;
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    background 0.35s ease,
+    color 0.25s ease;
 }
 
-/* ================= STAGGER ================= */
+/* ================= ENTRY ANIMATION ================= */
 
 .admin-card {
-  animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) both;
+  animation: fadeUp 0.5s cubic-bezier(.4,0,.2,1) both;
 }
 
-.admin-card:nth-child(1) { animation-delay: 0.05s; }
-.admin-card:nth-child(2) { animation-delay: 0.1s; }
-.admin-card:nth-child(3) { animation-delay: 0.15s; }
-.admin-card:nth-child(4) { animation-delay: 0.2s; }
-.admin-card:nth-child(5) { animation-delay: 0.25s; }
+.admin-card:nth-child(1) { animation-delay: 0.04s; }
+.admin-card:nth-child(2) { animation-delay: 0.08s; }
+.admin-card:nth-child(3) { animation-delay: 0.12s; }
+.admin-card:nth-child(4) { animation-delay: 0.16s; }
+.admin-card:nth-child(5) { animation-delay: 0.2s; }
 
-/* ================= SHINE ================= */
+/* ================= SHINE EFFECT ================= */
 
 .admin-card::before {
   content: "";
@@ -68,33 +90,36 @@
   inset: 0;
   z-index: -1;
 
-  background:
-    linear-gradient(
-      120deg,
-      transparent 30%,
-      rgba(255,255,255,0.55),
-      transparent 70%
-    );
+  background: linear-gradient(
+    120deg,
+    transparent 35%,
+    rgba(255,255,255,0.45),
+    transparent 65%
+  );
 
   transform: translateX(-120%);
-  transition: transform 0.8s ease;
+  transition: transform 0.7s ease;
 }
 
-/* ================= HOVER ================= */
+/* ================= HOVER (DESKTOP ONLY) ================= */
 
-.admin-card:hover {
-  background:
-    linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
+@media (hover: hover) {
+  .admin-card:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
 
-  transform: translateY(-10px) scale(1.04);
+    transform: translateY(-6px);
+    box-shadow: 0 22px 48px rgba(37, 99, 235, 0.35);
+  }
 
-  box-shadow:
-    0 28px 60px rgba(37, 99, 235, 0.35);
-}
+  .admin-card:hover::before {
+    transform: translateX(120%);
+  }
 
-.admin-card:hover::before {
-  transform: translateX(120%);
+  .admin-card:hover svg {
+    transform: scale(1.15);
+    filter: drop-shadow(0 6px 14px rgba(255,255,255,0.6));
+  }
 }
 
 /* ================= ACTIVE ================= */
@@ -106,37 +131,28 @@
 /* ================= ICON ================= */
 
 .admin-card svg {
-  margin-bottom: 12px;
-  transition:
-    transform 0.35s ease,
-    filter 0.35s ease;
-}
-
-.admin-card:hover svg {
-  transform: scale(1.2);
-  filter: drop-shadow(0 6px 16px rgba(255,255,255,0.65));
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 /* ================= DARK MODE ================= */
 
 [data-theme="dark"] .admin-dashboard {
-  background:
-    linear-gradient(135deg, #020617, #020617);
+  background: linear-gradient(135deg, #020617, #020617);
 }
 
 [data-theme="dark"] .admin-card {
-  background: rgba(2, 6, 23, 0.85);
+  background: rgba(2, 6, 23, 0.88);
   color: #e5e7eb;
   border-color: #1e293b;
 
-  box-shadow:
-    0 16px 36px rgba(0,0,0,0.55);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.6);
 }
 
-[data-theme="dark"] .admin-card:hover {
-  background:
-    linear-gradient(135deg, #4f46e5, #6366f1);
-  color: #ffffff;
+@media (hover: hover) {
+  [data-theme="dark"] .admin-card:hover {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #ffffff;
+  }
 }
 
 /* ================= ANIMATIONS ================= */
@@ -149,7 +165,7 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.96);
+    transform: translateY(14px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -160,10 +176,9 @@
 /* ================= REDUCED MOTION ================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .admin-card,
-  .admin-dashboard {
-    animation: none;
-    transition: none;
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -171,7 +186,7 @@
 
 @media (max-width: 768px) {
   .admin-dashboard {
-    padding: 18px;
+    padding: 16px;
   }
 
   .admin-grid {
@@ -180,9 +195,9 @@
   }
 
   .admin-card {
-    padding: 20px;
+    padding: 18px;
     font-size: 14px;
-    border-radius: 16px;
+    border-radius: 14px;
   }
 }
 
@@ -190,7 +205,7 @@
 
 @media (max-width: 420px) {
   .admin-card {
-    padding: 18px;
+    padding: 16px;
     font-size: 13.5px;
   }
 }
