@@ -12,7 +12,9 @@
   justify-content: space-around;
   align-items: center;
 
-  z-index: 100;
+  /* 🔥 IMPORTANT FIX */
+  z-index: 10000;            /* higher than toast */
+  pointer-events: auto;     /* ensure touch works */
 }
 
 /* NAV ITEM */
@@ -24,6 +26,10 @@
 
   font-size: 12px;
   color: var(--muted-text);
+
+  /* Mobile tap improvement */
+  padding: 6px 10px;
+  pointer-events: auto;
 }
 
 /* ACTIVE */
@@ -32,9 +38,16 @@
   font-weight: 500;
 }
 
-/* DESKTOP: HIDE */
+/* DESKTOP: HIDE BOTTOM NAV */
 @media (min-width: 768px) {
   .bottom-nav {
     display: none;
   }
+}
+
+/* ===============================
+   SAFETY: TOAST SHOULD NOT BLOCK
+================================ */
+[data-rht-toaster] {
+  pointer-events: none;     /* allow clicks through */
 }
