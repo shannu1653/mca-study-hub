@@ -11,17 +11,16 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /* ✅ CLEAR OLD SESSION ON LOAD */
+  /* ✅ CLEAR / REDIRECT ON LOAD */
   useEffect(() => {
-    const token = localStorage.getItem("access");
+    const token = localStorage.getItem("access_token");
 
     if (token) {
-      // already logged in
       const isAdmin = localStorage.getItem("is_admin") === "true";
       navigate(isAdmin ? "/admin" : "/home", { replace: true });
     } else {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
       localStorage.removeItem("is_admin");
       localStorage.removeItem("username");
     }
@@ -35,14 +34,14 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await api.post("auth/login/", {
+      const res = await api.post("/auth/login/", {
         email,
         password,
       });
 
-      /* ✅ STORE AUTH */
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      /* ✅ STORE AUTH (FIXED KEYS) */
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
       localStorage.setItem(
         "is_admin",
         res.data.is_admin ? "true" : "false"
