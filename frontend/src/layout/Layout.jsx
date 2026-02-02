@@ -38,6 +38,7 @@ function Layout() {
 
   /* 📄 PAGE TITLE (MOBILE) */
   const getTitle = () => {
+    if (location.pathname.startsWith("/admin")) return "Admin Dashboard";
     if (location.pathname.startsWith("/dashboard")) return "Dashboard";
     if (location.pathname.startsWith("/notes")) return "Notes";
     if (location.pathname.startsWith("/home")) return "Home";
@@ -117,9 +118,14 @@ function Layout() {
           <span className="page-title">{getTitle()}</span>
 
           <div className="mobile-actions">
+            {isAdmin && (
+              <button onClick={() => navigate("/admin")}>🛠</button>
+            )}
+
             <button onClick={() => setDarkMode(!darkMode)}>
               {darkMode ? "☀" : "🌙"}
             </button>
+
             <button onClick={logout}>🚪</button>
           </div>
         </header>
@@ -131,7 +137,12 @@ function Layout() {
 
       {/* ================= MOBILE BOTTOM NAV ================= */}
       <nav className="bottom-nav mobile-only">
-        {!isAdmin && (
+        {isAdmin ? (
+          <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
+            🛠
+            <span>Admin</span>
+          </Link>
+        ) : (
           <Link
             to="/dashboard"
             className={isActive("/dashboard") ? "active" : ""}
