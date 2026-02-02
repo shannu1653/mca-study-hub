@@ -42,7 +42,9 @@ function AdminDashboard() {
           <span>Manage Subjects</span>
         </Link>
 
+        {/* Manage Notes */}
         <button
+          type="button"
           className="admin-card primary"
           onClick={() => navigate("/admin/notes")}
         >
