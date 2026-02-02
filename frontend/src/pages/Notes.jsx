@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
@@ -32,7 +32,7 @@ export default function Notes() {
   const [activePdf, setActivePdf] = useState(null);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  /* ================= FETCH ================= */
+  /* ================= FETCH NOTES + YEARS ================= */
   useEffect(() => {
     Promise.all([
       api.get("notes/"),
@@ -109,22 +109,22 @@ export default function Notes() {
 
   /* ================= VIEW PDF ================= */
   const handleView = (note) => {
-    if (!note.file) {
+    if (!note.pdf_url) {
       alert("PDF not available");
       return;
     }
     setActivePdf(activePdf === note.id ? null : note.id);
   };
 
-  /* ================= DOWNLOAD ================= */
+  /* ================= DOWNLOAD PDF ================= */
   const handleDownload = (note) => {
-    if (!note.file) {
+    if (!note.pdf_url) {
       alert("PDF not available");
       return;
     }
 
     const link = document.createElement("a");
-    link.href = note.file;
+    link.href = note.pdf_url;
     link.download = `${note.title}.pdf`;
     link.target = "_blank";
     link.click();
@@ -201,20 +201,25 @@ export default function Notes() {
       <div className="notes-grid">
         {displayNotes.map((note) => (
           <div key={note.id} className="note-card">
-            {isNewNote(note.created_at) && <span className="new-badge">NEW</span>}
+            {isNewNote(note.created_at) && (
+              <span className="new-badge">NEW</span>
+            )}
 
             <h3>{note.title}</h3>
             <p className="note-meta">
               {note.subject?.name} • {note.subject?.semester?.name}
             </p>
 
-            <div className="pdf-preview" onClick={() => handleView(note)}>
+            <div
+              className="pdf-preview"
+              onClick={() => handleView(note)}
+            >
               📄 PDF • {note.download_count || 0} downloads
             </div>
 
             {activePdf === note.id && (
               <iframe
-                src={note.file}
+                src={note.pdf_url}
                 title={note.title}
                 width="100%"
                 height="420"
