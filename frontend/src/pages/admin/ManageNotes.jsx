@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import Layout from "../../layout/Layout";
 import toast from "react-hot-toast";
-import "../../styles/manageNotes.css";
+import "../../styles/ManageNotes.css";
 
 
 function ManageNotes() {
