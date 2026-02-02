@@ -29,7 +29,6 @@ export default function Notes() {
   );
   const [showSaved, setShowSaved] = useState(false);
 
-  const [activePdf, setActivePdf] = useState(null);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   /* ================= FETCH NOTES + YEARS ================= */
@@ -84,10 +83,10 @@ export default function Notes() {
       .catch(() => setSubjects([]));
   }, [semester]);
 
-  /* ================= FILTER (FIXED) ================= */
+  /* ================= FILTER ================= */
   const filteredNotes = notes.filter((n) => {
     return (
-      n.title?.toLowerCase().includes(search.toLowerCase()) &&
+      n.title?.toLowerCase().includes(search.trim().toLowerCase()) &&
       (!year || n.subject?.semester?.year?.id === Number(year)) &&
       (!semester || n.subject?.semester?.id === Number(semester)) &&
       (!subject || n.subject?.id === Number(subject))
@@ -110,27 +109,13 @@ export default function Notes() {
     localStorage.setItem("bookmarks", JSON.stringify(updated));
   };
 
-  /* ================= VIEW PDF ================= */
-  const handleView = (note) => {
+  /* ================= OPEN PDF ================= */
+  const openPdf = (note) => {
     if (!note.pdf_url) {
       alert("PDF not available");
       return;
     }
-    setActivePdf(activePdf === note.id ? null : note.id);
-  };
-
-  /* ================= DOWNLOAD PDF ================= */
-  const handleDownload = (note) => {
-    if (!note.pdf_url) {
-      alert("PDF not available");
-      return;
-    }
-
-    const link = document.createElement("a");
-    link.href = note.pdf_url;
-    link.download = `${note.title}.pdf`;
-    link.target = "_blank";
-    link.click();
+    window.open(note.pdf_url, "_blank");
   };
 
   /* ================= INFINITE SCROLL ================= */
@@ -206,6 +191,12 @@ export default function Notes() {
 
       {loading && <p>Loading...</p>}
 
+      {!loading && finalNotes.length === 0 && (
+        <p style={{ textAlign: "center", marginTop: 40 }}>
+          No notes found.
+        </p>
+      )}
+
       {/* NOTES GRID */}
       <div className="notes-grid">
         {displayNotes.map((note) => (
@@ -219,22 +210,16 @@ export default function Notes() {
               {note.subject?.name} • {note.subject?.semester?.name}
             </p>
 
-            <div className="pdf-preview" onClick={() => handleView(note)}>
-              📄 PDF • {note.download_count || 0} downloads
+            <div
+              className="pdf-preview"
+              onClick={() => openPdf(note)}
+            >
+              📄 Open PDF • {note.download_count || 0} downloads
             </div>
 
-            {activePdf === note.id && (
-              <iframe
-                src={note.pdf_url}
-                title={note.title}
-                width="100%"
-                height="420"
-              />
-            )}
-
             <div className="note-actions">
-              <button onClick={() => handleView(note)}>👁 View</button>
-              <button onClick={() => handleDownload(note)}>⬇ Download</button>
+              <button onClick={() => openPdf(note)}>👁 View</button>
+              <button onClick={() => openPdf(note)}>⬇ Download</button>
               <button onClick={() => toggleBookmark(note.id)}>
                 {bookmarks.includes(note.id) ? "⭐" : "☆"}
               </button>
