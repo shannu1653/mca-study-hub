@@ -52,39 +52,46 @@ function AdminUpload() {
       .then(res => setSubjects(res.data));
   }, [selectedSemester]);
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
+const handleUpload = async (e) => {
+  e.preventDefault();
 
-    if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
-      toast.error("All fields required");
-      return;
+  if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
+    toast.error("All fields required");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const pdfUrl = await uploadPDF(file);
+
+    if (!pdfUrl) {
+      throw new Error("Supabase upload failed");
     }
 
-    setLoading(true);
+    await api.post("notes/", {
+      title,
+      subject_id: selectedSubject,   // ✅ FIXED
+      pdf_url: pdfUrl,
+    });
 
-    try {
-      const pdfUrl = await uploadPDF(file);
+    toast.success("Note uploaded");
 
-      await api.post("notes/", {
-        title,
-        subject: selectedSubject,
-        pdf_url: pdfUrl,
-      });
+    setTitle("");
+    setFile(null);
+    setSelectedYear("");
+    setSelectedSemester("");
+    setSelectedSubject("");
+    fileInputRef.current.value = "";
 
-      toast.success("Note uploaded");
-      setTitle("");
-      setFile(null);
-      setSelectedYear("");
-      setSelectedSemester("");
-      setSelectedSubject("");
+  } catch (err) {
+    console.error(err);
+    toast.error("Upload failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      fileInputRef.current.value = "";
-    } catch {
-      toast.error("Upload failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="upload-page">

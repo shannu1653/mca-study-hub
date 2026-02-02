@@ -23,6 +23,7 @@ from .serializers import (
 class NotesView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # ✅ LIST NOTES
     def get(self, request):
         notes = (
             Note.objects
@@ -36,6 +37,7 @@ class NotesView(APIView):
         serializer = NoteSerializer(notes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # ✅ CREATE NOTE (LIVE: Supabase URL only)
     def post(self, request):
         if not request.user.is_staff:
             return Response(
@@ -46,6 +48,7 @@ class NotesView(APIView):
         serializer = NoteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(
             {"message": "Note uploaded successfully"},
             status=status.HTTP_201_CREATED
