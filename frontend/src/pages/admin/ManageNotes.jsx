@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
-import Layout from "../../layout/Layout";
 import toast from "react-hot-toast";
-import "../../styles/ManageNotes.css";
-
+import "../../styles/manageNotes.css";
 
 function ManageNotes() {
   const [notes, setNotes] = useState([]);
@@ -16,7 +14,7 @@ function ManageNotes() {
       setLoading(true);
       const res = await api.get("notes/");
       setNotes(res.data || []);
-    } catch (err) {
+    } catch {
       toast.error("Failed to load notes");
     } finally {
       setLoading(false);
@@ -38,7 +36,7 @@ function ManageNotes() {
       await api.delete(`notes/${id}/`);
       toast.success("Note deleted successfully");
       setNotes((prev) => prev.filter((n) => n.id !== id));
-    } catch (err) {
+    } catch {
       toast.error("Delete failed");
     }
   };
@@ -49,55 +47,51 @@ function ManageNotes() {
   );
 
   return (
-    <Layout>
-      <div className="manage-notes-page">
-        {/* HEADER */}
-        <div className="manage-header">
-          <h2>📄 Manage Notes</h2>
-          <p>View, search and delete uploaded notes</p>
-        </div>
-
-        {/* SEARCH */}
-        <input
-          type="text"
-          placeholder="Search notes by title..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="admin-search"
-        />
-
-        {/* LOADING */}
-        {loading && <p>Loading notes...</p>}
-
-        {/* EMPTY */}
-        {!loading && filteredNotes.length === 0 && (
-          <p>No notes found</p>
-        )}
-
-        {/* LIST */}
-        {!loading &&
-          filteredNotes.map((note) => (
-            <div key={note.id} className="admin-note-row">
-              <div className="note-info">
-                <strong>{note.title}</strong>
-                <span>
-                  {note.subject?.name} •{" "}
-                  {note.subject?.semester?.name}
-                </span>
-              </div>
-
-              <div className="note-actions">
-                <button
-                  className="danger"
-                  onClick={() => deleteNote(note.id, note.title)}
-                >
-                  🗑 Delete
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="manage-notes-page">
+      {/* HEADER */}
+      <div className="manage-header">
+        <h2>📄 Manage Notes</h2>
+        <p>View, search and delete uploaded notes</p>
       </div>
-    </Layout>
+
+      {/* SEARCH */}
+      <input
+        type="text"
+        placeholder="Search notes by title..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="admin-search"
+      />
+
+      {/* LOADING */}
+      {loading && <p className="admin-loading">Loading notes...</p>}
+
+      {/* EMPTY */}
+      {!loading && filteredNotes.length === 0 && (
+        <p className="admin-empty">No notes found</p>
+      )}
+
+      {/* LIST */}
+      {!loading &&
+        filteredNotes.map((note) => (
+          <div key={note.id} className="admin-note-row">
+            <div className="note-info">
+              <strong>{note.title}</strong>
+              <span>
+                {note.subject?.name} •{" "}
+                {note.subject?.semester?.name}
+              </span>
+            </div>
+
+            <button
+              className="danger"
+              onClick={() => deleteNote(note.id, note.title)}
+            >
+              🗑 Delete
+            </button>
+          </div>
+        ))}
+    </div>
   );
 }
 
