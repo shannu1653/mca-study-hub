@@ -33,3 +33,24 @@
   border-radius: 6px;
   font-size: 14px;
 }
+
+/* ===============================
+   MOBILE DASHBOARD BUTTON
+================================ */
+.mobile-dashboard-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* SHOW ONLY ON MOBILE */
+@media (max-width: 768px) {
+  .mobile-dashboard-btn {
+    display: flex;
+  }
+}
