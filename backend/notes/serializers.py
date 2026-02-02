@@ -40,18 +40,15 @@ class SubjectDetailSerializer(serializers.ModelSerializer):
 
 # ================= NOTE =================
 class NoteSerializer(serializers.ModelSerializer):
-    # READ: nested subject
     subject = SubjectDetailSerializer(read_only=True)
 
-    # WRITE: subject id only
     subject_id = serializers.PrimaryKeyRelatedField(
         queryset=Subject.objects.all(),
         source="subject",
         write_only=True
     )
 
-    # READ: full pdf url
-    pdf_url = serializers.SerializerMethodField(read_only=True)
+    pdf_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Note
@@ -64,28 +61,3 @@ class NoteSerializer(serializers.ModelSerializer):
             "created_at",
             "download_count",
         ]
-
-    def get_pdf_url(self, obj):
-        """
-        Safe for:
-        - local development
-        - Render
-        - Supabase / cloud URLs
-        """
-        if not obj.pdf:
-            return None
-
-        pdf_url = obj.pdf.url
-
-        request = self.context.get("request")
-
-        # If already absolute URL (Supabase, S3, etc.)
-        if pdf_url.startswith("http"):
-            return pdf_url
-
-        # Build absolute URL only if request exists
-        if request:
-            return request.build_absolute_uri(pdf_url)
-
-        # Fallback (prevents 500 error)
-        return pdf_url

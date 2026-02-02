@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
@@ -24,9 +24,14 @@ export default function Notes() {
   const [semester, setSemester] = useState("");
   const [subject, setSubject] = useState("");
 
-  const [bookmarks, setBookmarks] = useState(
-    JSON.parse(localStorage.getItem("bookmarks")) || []
-  );
+  const [bookmarks, setBookmarks] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("bookmarks")) || [];
+    } catch {
+      return [];
+    }
+  });
+
   const [showSaved, setShowSaved] = useState(false);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
@@ -42,13 +47,7 @@ export default function Notes() {
         setNotes(notesRes.data || []);
         setYears(yearsRes.data || []);
       } catch (err) {
-        if (err.response?.status === 401) {
-          alert("Session expired. Please login again.");
-          localStorage.clear();
-          window.location.href = "/login";
-        } else {
-          console.error("Notes fetch failed", err);
-        }
+        console.error("Notes fetch failed", err);
       } finally {
         setLoading(false);
       }
@@ -95,14 +94,16 @@ export default function Notes() {
   }, [semester]);
 
   /* ================= FILTER ================= */
-  const filteredNotes = notes.filter((n) => {
-    return (
-      n.title?.toLowerCase().includes(search.trim().toLowerCase()) &&
-      (!year || n.subject?.semester?.year?.id === Number(year)) &&
-      (!semester || n.subject?.semester?.id === Number(semester)) &&
-      (!subject || n.subject?.id === Number(subject))
-    );
-  });
+  const filteredNotes = useMemo(() => {
+    return notes.filter((n) => {
+      return (
+        n.title?.toLowerCase().includes(search.trim().toLowerCase()) &&
+        (!year || n.subject?.semester?.year?.id === Number(year)) &&
+        (!semester || n.subject?.semester?.id === Number(semester)) &&
+        (!subject || n.subject?.id === Number(subject))
+      );
+    });
+  }, [notes, search, year, semester, subject]);
 
   const finalNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
@@ -221,10 +222,7 @@ export default function Notes() {
               {note.subject?.name} • {note.subject?.semester?.name}
             </p>
 
-            <div
-              className="pdf-preview"
-              onClick={() => openPdf(note)}
-            >
+            <div className="pdf-preview" onClick={() => openPdf(note)}>
               📄 Open PDF • {note.download_count || 0} downloads
             </div>
 

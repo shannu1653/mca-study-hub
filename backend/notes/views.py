@@ -7,7 +7,6 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import AuthenticationFailed
 
 from .models import Note, Year, Semester, Subject
 from .serializers import (
@@ -25,30 +24,22 @@ class NotesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        try:
-            notes = (
-                Note.objects
-                .select_related(
-                    "subject",
-                    "subject__semester",
-                    "subject__semester__year"
-                )
-                .order_by("-created_at")
+        notes = (
+            Note.objects
+            .select_related(
+                "subject",
+                "subject__semester",
+                "subject__semester__year"
             )
-            serializer = NoteSerializer(notes, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            .order_by("-created_at")
+        )
 
-        except AuthenticationFailed:
-            return Response(
-                {"detail": "Session expired. Please login again."},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        except Exception as e:
-            return Response(
-                {"detail": "Something went wrong", "error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        serializer = NoteSerializer(
+            notes,
+            many=True,
+            context={"request": request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         if not request.user.is_staff:
