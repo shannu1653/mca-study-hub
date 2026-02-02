@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../api/axios";
 import "../styles/notes.css";
 
@@ -28,22 +28,33 @@ export default function Notes() {
     JSON.parse(localStorage.getItem("bookmarks")) || []
   );
   const [showSaved, setShowSaved] = useState(false);
-
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   /* ================= FETCH NOTES + YEARS ================= */
   useEffect(() => {
-    Promise.all([api.get("notes/"), api.get("notes/years/")])
-      .then(([notesRes, yearsRes]) => {
+    const fetchData = async () => {
+      try {
+        const [notesRes, yearsRes] = await Promise.all([
+          api.get("/notes/"),
+          api.get("/notes/years/"),
+        ]);
+
         setNotes(notesRes.data || []);
         setYears(yearsRes.data || []);
-      })
-      .catch(() => {
-        alert("Session expired. Please login again.");
-        localStorage.clear();
-        window.location.href = "/login";
-      })
-      .finally(() => setLoading(false));
+      } catch (err) {
+        if (err.response?.status === 401) {
+          alert("Session expired. Please login again.");
+          localStorage.clear();
+          window.location.href = "/login";
+        } else {
+          console.error("Notes fetch failed", err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   /* ================= RESET SCROLL ================= */
@@ -63,7 +74,7 @@ export default function Notes() {
     }
 
     api
-      .get(`notes/semesters/?year=${year}`)
+      .get(`/notes/semesters/?year=${year}`)
       .then((res) => setSemesters(res.data || []))
       .catch(() => setSemesters([]));
   }, [year]);
@@ -78,7 +89,7 @@ export default function Notes() {
     }
 
     api
-      .get(`notes/subjects/?semester=${semester}`)
+      .get(`/notes/subjects/?semester=${semester}`)
       .then((res) => setSubjects(res.data || []))
       .catch(() => setSubjects([]));
   }, [semester]);
@@ -115,25 +126,25 @@ export default function Notes() {
       alert("PDF not available");
       return;
     }
-    window.open(note.pdf_url, "_blank");
+    window.open(note.pdf_url, "_blank", "noopener");
   };
 
   /* ================= INFINITE SCROLL ================= */
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 200
-      ) {
-        if (visibleCount < finalNotes.length) {
-          setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
-        }
-      }
-    };
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - 200
+    ) {
+      setVisibleCount((prev) =>
+        prev < finalNotes.length ? prev + ITEMS_PER_PAGE : prev
+      );
+    }
+  }, [finalNotes.length]);
 
+  useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [visibleCount, finalNotes.length]);
+  }, [handleScroll]);
 
   /* ================= UI ================= */
   return (

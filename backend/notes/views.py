@@ -7,6 +7,7 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import AuthenticationFailed
 
 from .models import Note, Year, Semester, Subject
 from .serializers import (
@@ -23,21 +24,32 @@ from .serializers import (
 class NotesView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # ✅ LIST NOTES
     def get(self, request):
-        notes = (
-            Note.objects
-            .select_related(
-                "subject",
-                "subject__semester",
-                "subject__semester__year"
+        try:
+            notes = (
+                Note.objects
+                .select_related(
+                    "subject",
+                    "subject__semester",
+                    "subject__semester__year"
+                )
+                .order_by("-created_at")
             )
-            .order_by("-created_at")
-        )
-        serializer = NoteSerializer(notes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = NoteSerializer(notes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # ✅ CREATE NOTE (LIVE: Supabase URL only)
+        except AuthenticationFailed:
+            return Response(
+                {"detail": "Session expired. Please login again."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": "Something went wrong", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     def post(self, request):
         if not request.user.is_staff:
             return Response(
@@ -84,7 +96,10 @@ class YearListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().post(request, *args, **kwargs)
 
 
@@ -95,7 +110,10 @@ class YearDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().delete(request, *args, **kwargs)
 
 
@@ -116,7 +134,10 @@ class SemesterListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().post(request, *args, **kwargs)
 
 
@@ -127,7 +148,10 @@ class SemesterDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().delete(request, *args, **kwargs)
 
 
@@ -148,7 +172,10 @@ class SubjectListCreateView(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().post(request, *args, **kwargs)
 
 
@@ -159,5 +186,8 @@ class SubjectDeleteView(DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Admin only"}, status=403)
+            return Response(
+                {"detail": "Admin only"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().delete(request, *args, **kwargs)
