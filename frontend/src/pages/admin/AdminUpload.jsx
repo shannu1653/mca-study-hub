@@ -6,7 +6,6 @@ import "../../styles/adminUpload.css";
 import { uploadPDF } from "../../utils/supabaseUpload";
 
 function AdminUpload() {
-  /* ================= AUTH GUARD ================= */
   const token = localStorage.getItem("access");
   const isAdmin = localStorage.getItem("is_admin") === "true";
 
@@ -16,121 +15,91 @@ function AdminUpload() {
     }
   }, [token, isAdmin]);
 
-  /* ================= DATA ================= */
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
 
-  /* ================= FORM ================= */
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef(null);
 
-
-  
-  /* ================= LOAD YEARS ================= */
+  /* ===== LOAD DATA ===== */
   useEffect(() => {
     api.get("notes/years/")
       .then(res => setYears(res.data))
       .catch(() => toast.error("Failed to load years"));
   }, []);
-  
-  /* ================= LOAD SEMESTERS ================= */
-  useEffect(() => {
-    if (!selectedYear) {
-      setSemesters([]);
-      setSelectedSemester("");
-      setSelectedSubject("");
-      return;
-    }
 
+  useEffect(() => {
+    if (!selectedYear) return setSemesters([]);
     api.get(`notes/semesters/?year=${selectedYear}`)
-      .then(res => setSemesters(res.data))
-      .catch(() => toast.error("Failed to load semesters"));
+      .then(res => setSemesters(res.data));
   }, [selectedYear]);
 
-  /* ================= LOAD SUBJECTS ================= */
   useEffect(() => {
-    if (!selectedSemester) {
-      setSubjects([]);
-      setSelectedSubject("");
+    if (!selectedSemester) return setSubjects([]);
+    api.get(`notes/subjects/?semester=${selectedSemester}`)
+      .then(res => setSubjects(res.data));
+  }, [selectedSemester]);
+
+  /* ===== FILE HANDLERS ===== */
+  const handleFile = (file) => {
+    if (!file) return;
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error("PDF must be under 30MB");
+      return;
+    }
+    setFile(file);
+  };
+
+  /* ===== UPLOAD ===== */
+  const handleUpload = async (e) => {
+    e.preventDefault();
+
+    if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
+      toast.error("All fields are required");
       return;
     }
 
-    api.get(`notes/subjects/?semester=${selectedSemester}`)
-      .then(res => setSubjects(res.data))
-      .catch(() => toast.error("Failed to load subjects"));
-  }, [selectedSemester]);
+    setLoading(true);
+    try {
+      const pdfUrl = await uploadPDF(file);
 
-  /* ================= UPLOAD ================= */
-  const handleUpload = async (e) => {
-  e.preventDefault();
+      await api.post("notes/", {
+        title: title.trim(),
+        subject: selectedSubject,
+        pdf_url: pdfUrl,
+      });
 
-  // ✅ Required fields check
-  if (
-    !selectedYear ||
-    !selectedSemester ||
-    !selectedSubject ||
-    !title.trim() ||
-    !file
-  ) {
-    toast.error("All fields are required");
-    return;
-  }
+      toast.success("Note uploaded successfully");
 
-  // ✅ FILE SIZE VALIDATION (50 MB)
-  if (file.size > 30 * 1024 * 1024) {
-    toast.error("PDF size must be under 30 MB");
-    return;
-  }
+      setSelectedYear("");
+      setSelectedSemester("");
+      setSelectedSubject("");
+      setTitle("");
+      setFile(null);
+      setSemesters([]);
+      setSubjects([]);
 
-  setLoading(true);
-
-  try {
-    const pdfUrl = await uploadPDF(file);
-
-    await api.post("notes/", {
-      title: title.trim(),
-      subject: selectedSubject,
-      pdf_url: pdfUrl,
-    });
-
-    toast.success("Note uploaded successfully");
-
-    // 🔄 Reset form
-    setSelectedYear("");
-    setSelectedSemester("");
-    setSelectedSubject("");
-    setTitle("");
-    setFile(null);
-    setSemesters([]);
-    setSubjects([]);
-
-    if (fileInputRef.current) {
       fileInputRef.current.value = "";
-    }
-  } catch (error) {
-    if (error.response?.status === 401) {
-      localStorage.clear();
-      window.location.href = "/login";
-    } else {
+    } catch {
       toast.error("Upload failed");
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <Layout>
       <div className="upload-wrapper">
         <div className="upload-card">
-          <h2>Upload Notes</h2>
-          <p className="subtitle">Add MCA study material (PDF only)</p>
+          <h2>📤 Upload Notes</h2>
+          <p className="subtitle">PDF only · Max 30MB</p>
 
           <form onSubmit={handleUpload}>
             <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
@@ -152,9 +121,7 @@ function AdminUpload() {
               onChange={e => setSelectedSubject(e.target.value)}
               disabled={!selectedSemester}
             >
-              <option value="">
-                {selectedSemester ? "Select Subject" : "Select semester first"}
-              </option>
+              <option value="">Select Subject</option>
               {subjects.map(sub => (
                 <option key={sub.id} value={sub.id}>{sub.name}</option>
               ))}
@@ -167,31 +134,34 @@ function AdminUpload() {
               onChange={e => setTitle(e.target.value)}
             />
 
+            {/* DRAG & DROP */}
+            <div
+              className="drop-zone"
+              onClick={() => fileInputRef.current.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleFile(e.dataTransfer.files[0]);
+              }}
+            >
+              {file ? (
+                <p>📄 {file.name}</p>
+              ) : (
+                <p>Drag & drop PDF here or click</p>
+              )}
+            </div>
+
             <input
               ref={fileInputRef}
               type="file"
               accept="application/pdf"
-              onChange={e => setFile(e.target.files[0])}
+              hidden
+              onChange={e => handleFile(e.target.files[0])}
             />
 
-            {file && (
-              <p className="file-info">
-                📄 {(file.size / (1024 * 1024)).toFixed(2)} MB selected
-              </p>
-            )}
-
-            <p className="hint-text">
-              ⚠️ Only PDF · Max 30MB
-            </p>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="upload-btn"
-            >
-              {loading ? "Uploading… Please wait ⏳" : "Upload Note"}
+            <button disabled={loading} className="upload-btn">
+              {loading ? "Uploading…" : "Upload Note"}
             </button>
-            
           </form>
         </div>
       </div>

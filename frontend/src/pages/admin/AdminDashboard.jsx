@@ -1,4 +1,3 @@
-import Layout from "../../layout/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Upload,
@@ -14,55 +13,44 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   return (
-    <Layout>
-      <div className="admin-dashboard">
-        {/* Header */}
-        <div className="admin-card admin-header">
-          <h2>Admin Panel</h2>
-          <p>Manage MCA Study Point</p>
-        </div>
-
-        {/* Cards */}
-        <div className="admin-grid">
-          <div className="admin-card">
-            <Link to="/admin/upload">
-              <Upload size={28} />
-              <span>Upload Notes</span>
-            </Link>
-          </div>
-
-          <div className="admin-card">
-            <Link to="/admin/years">
-              <Calendar size={28} />
-              <span>Manage Years</span>
-            </Link>
-          </div>
-
-          <div className="admin-card">
-            <Link to="/admin/semesters">
-              <Layers size={28} />
-              <span>Manage Semesters</span>
-            </Link>
-          </div>
-
-          <div className="admin-card">
-            <Link to="/admin/subjects">
-              <BookOpen size={28} />
-              <span>Manage Subjects</span>
-            </Link>
-          </div>
-
-          {/* Manage Notes Button */}
-          <button
-            className="admin-btn primary"
-            onClick={() => navigate("/admin/notes")}
-          >
-            <FileText size={22} />
-            <span>Manage Notes</span>
-          </button>
-        </div>
+    <div className="admin-dashboard">
+      {/* ================= HEADER ================= */}
+      <div className="admin-header">
+        <h2>Admin Dashboard</h2>
+        <p>Manage MCA Study Hub content</p>
       </div>
-    </Layout>
+
+      {/* ================= GRID ================= */}
+      <div className="admin-grid">
+        <Link to="/admin/upload" className="admin-card">
+          <Upload size={30} />
+          <span>Upload Notes</span>
+        </Link>
+
+        <Link to="/admin/years" className="admin-card">
+          <Calendar size={30} />
+          <span>Manage Years</span>
+        </Link>
+
+        <Link to="/admin/semesters" className="admin-card">
+          <Layers size={30} />
+          <span>Manage Semesters</span>
+        </Link>
+
+        <Link to="/admin/subjects" className="admin-card">
+          <BookOpen size={30} />
+          <span>Manage Subjects</span>
+        </Link>
+
+        <button
+          className="admin-card primary"
+          onClick={() => navigate("/admin/notes")}
+        >
+          <FileText size={26} />
+          <span>Manage Notes</span>
+        </button>
+      </div>
+    </div>
   );
 }
 

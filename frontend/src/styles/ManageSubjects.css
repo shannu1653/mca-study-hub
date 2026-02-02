@@ -1,0 +1,207 @@
+/* ===============================
+   MANAGE SUBJECTS – PREMIUM UI
+================================ */
+
+.card {
+  padding: 24px;
+  max-width: 900px;
+  margin: auto;
+  animation: fadePage 0.5s ease;
+}
+
+.card h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* ===============================
+   FORM CONTROLS
+================================ */
+
+.card select,
+.card input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  transition: all 0.25s ease;
+}
+
+.card select:focus,
+.card input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.card button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+}
+
+.card button:active {
+  transform: scale(0.96);
+}
+
+/* ===============================
+   SUBJECT LIST
+================================ */
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  animation: fadeUp 0.4s ease both;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.admin-row:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.12);
+}
+
+.admin-row span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #fee2e2;
+  color: #b91c1c;
+  transition: all 0.25s ease;
+}
+
+.delete-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* EMPTY STATE */
+.admin-list p {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* ===============================
+   DARK MODE
+================================ */
+
+[data-theme="dark"] .card {
+  background: transparent;
+}
+
+[data-theme="dark"] .card select,
+[data-theme="dark"] .card input {
+  background: #020617;
+  border-color: #1e293b;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .admin-row {
+  background: #020617;
+  border-color: #1e293b;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] .admin-row span {
+  color: #e5e7eb;
+}
+
+/* ===============================
+   TABLET
+================================ */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 18px;
+  }
+}
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media (max-width: 480px) {
+  .admin-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .delete-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadePage {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===============================
+   REDUCED MOTION
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

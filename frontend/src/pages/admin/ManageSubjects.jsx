@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
+import "../../styles/ManageSubjects.css"
 
 function ManageSubjects() {
   const [subjects, setSubjects] = useState([]);

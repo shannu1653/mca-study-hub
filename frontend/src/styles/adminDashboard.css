@@ -1,128 +1,155 @@
-/* 🌟 ADMIN DASHBOARD */
+/* 🌟 ADMIN DASHBOARD – PREMIUM EDITION */
+
 .admin-dashboard {
-  padding: 24px;
-  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  padding: 28px;
   min-height: 100vh;
-  animation: pageFade 0.6s ease-in-out both;
+  background:
+    linear-gradient(135deg, #f8fafc, #eef2ff);
+  animation: pageFade 0.45s ease both;
 }
 
-/* 🧩 GRID */
+/* ================= GRID ================= */
+
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  margin-top: 26px;
 }
 
-/* 🃏 CARD */
+/* ================= CARD ================= */
+
 .admin-card {
   position: relative;
-  background: #ffffff;
-  padding: 22px;
-  border-radius: 16px;
+  isolation: isolate;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+
+  padding: 26px 22px;
+  border-radius: 18px;
+
   text-align: center;
   font-weight: 600;
   font-size: 15px;
   color: #1f2937;
-  border: 1px solid #e5e7eb;
+
+  border: 1px solid rgba(226, 232, 240, 0.8);
   text-decoration: none;
   cursor: pointer;
-  overflow: hidden;
 
-  /* ✨ Premium effects */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.06);
+
   transition:
     transform 0.35s cubic-bezier(.4,0,.2,1),
     box-shadow 0.35s ease,
-    background 0.5s ease,
-    color 0.35s ease;
+    background 0.45s ease,
+    color 0.3s ease;
 }
 
-/* 🌊 STAGGER ANIMATION */
+/* ================= STAGGER ================= */
+
 .admin-card {
-  animation: fadeUp 0.7s cubic-bezier(.4,0,.2,1) both;
+  animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) both;
 }
 
 .admin-card:nth-child(1) { animation-delay: 0.05s; }
-.admin-card:nth-child(2) { animation-delay: 0.12s; }
-.admin-card:nth-child(3) { animation-delay: 0.19s; }
-.admin-card:nth-child(4) { animation-delay: 0.26s; }
-.admin-card:nth-child(5) { animation-delay: 0.33s; }
+.admin-card:nth-child(2) { animation-delay: 0.1s; }
+.admin-card:nth-child(3) { animation-delay: 0.15s; }
+.admin-card:nth-child(4) { animation-delay: 0.2s; }
+.admin-card:nth-child(5) { animation-delay: 0.25s; }
 
-/* ✨ SHINE EFFECT */
+/* ================= SHINE ================= */
+
 .admin-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.45),
-    transparent 70%
-  );
-  transform: translateX(-100%);
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255,255,255,0.55),
+      transparent 70%
+    );
+
+  transform: translateX(-120%);
   transition: transform 0.8s ease;
 }
 
-/* 🚀 HOVER */
+/* ================= HOVER ================= */
+
 .admin-card:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background:
+    linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.35);
+
+  transform: translateY(-10px) scale(1.04);
+
+  box-shadow:
+    0 28px 60px rgba(37, 99, 235, 0.35);
 }
 
 .admin-card:hover::before {
-  transform: translateX(100%);
+  transform: translateX(120%);
 }
 
-/* 🎯 ACTIVE (CLICK) */
+/* ================= ACTIVE ================= */
+
 .admin-card:active {
   transform: scale(0.97);
 }
 
-/* 🔥 ICON GLOW (if icon inside card) */
+/* ================= ICON ================= */
+
 .admin-card svg {
-  margin-bottom: 10px;
-  transition: transform 0.4s ease, filter 0.4s ease;
+  margin-bottom: 12px;
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
 }
 
 .admin-card:hover svg {
-  transform: scale(1.15);
-  filter: drop-shadow(0 6px 14px rgba(255,255,255,0.6));
+  transform: scale(1.2);
+  filter: drop-shadow(0 6px 16px rgba(255,255,255,0.65));
 }
 
-/* 🌙 DARK MODE SUPPORT */
-.dark .admin-dashboard {
-  background: linear-gradient(135deg, #020617, #020617);
+/* ================= DARK MODE ================= */
+
+[data-theme="dark"] .admin-dashboard {
+  background:
+    linear-gradient(135deg, #020617, #020617);
 }
 
-.dark .admin-card {
-  background: #020617;
+[data-theme="dark"] .admin-card {
+  background: rgba(2, 6, 23, 0.85);
   color: #e5e7eb;
   border-color: #1e293b;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+
+  box-shadow:
+    0 16px 36px rgba(0,0,0,0.55);
 }
 
-.dark .admin-card:hover {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+[data-theme="dark"] .admin-card:hover {
+  background:
+    linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
 }
 
-/* 🌊 PAGE FADE */
+/* ================= ANIMATIONS ================= */
+
 @keyframes pageFade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* 🌊 FADE UP */
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(18px) scale(0.96);
+    transform: translateY(20px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -130,7 +157,8 @@
   }
 }
 
-/* 🧘 REDUCED MOTION */
+/* ================= REDUCED MOTION ================= */
+
 @media (prefers-reduced-motion: reduce) {
   .admin-card,
   .admin-dashboard {
@@ -139,10 +167,11 @@
   }
 }
 
-/* 📱 MOBILE */
+/* ================= MOBILE ================= */
+
 @media (max-width: 768px) {
   .admin-dashboard {
-    padding: 16px;
+    padding: 18px;
   }
 
   .admin-grid {
@@ -151,16 +180,17 @@
   }
 
   .admin-card {
-    padding: 18px;
+    padding: 20px;
     font-size: 14px;
-    border-radius: 14px;
+    border-radius: 16px;
   }
 }
 
-/* 📱 SMALL MOBILE */
+/* ================= SMALL MOBILE ================= */
+
 @media (max-width: 420px) {
   .admin-card {
-    padding: 16px;
+    padding: 18px;
     font-size: 13.5px;
   }
 }

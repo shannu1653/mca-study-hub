@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
+import "../../styles/manageSemesters.css";
+
 
 function ManageSemesters() {
   const [years, setYears] = useState([]);

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getYears, createYear, deleteYear } from "../../api/adminApi";
 import toast from "react-hot-toast";
+import "../../styles/manageYears.css";
+
 
 function ManageYears() {
   const [years, setYears] = useState([]);
