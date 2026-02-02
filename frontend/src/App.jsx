@@ -29,7 +29,7 @@ import ManageSubjects from "./pages/admin/ManageSubjects";
 import ManageNotes from "./pages/admin/ManageNotes";
 
 function App() {
-  const token = localStorage.getItem("access");
+  const token = localStorage.getItem("access_token"); // ✅ FIX
   const isAdmin = localStorage.getItem("is_admin") === "true";
 
   return (
@@ -52,7 +52,7 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* ================= SHARED (USER + ADMIN) ================= */}
+      {/* ================= AUTHENTICATED (USER + ADMIN) ================= */}
       <Route
         element={
           <ProtectedRoute>
@@ -62,20 +62,8 @@ function App() {
       >
         <Route path="/home" element={<Home />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
       </Route>
-
-      {/* ================= USER ONLY ================= */}
-      {!isAdmin && (
-        <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<UserDashboard />} />
-        </Route>
-      )}
 
       {/* ================= ADMIN ONLY ================= */}
       <Route
