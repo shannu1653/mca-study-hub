@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
-import "../../styles/manageNotes.css";
+import "../../styles/ManageNotes.css";
 
 function ManageNotes() {
   const [notes, setNotes] = useState([]);
