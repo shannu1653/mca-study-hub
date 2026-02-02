@@ -34,10 +34,7 @@ export default function Notes() {
 
   /* ================= FETCH NOTES + YEARS ================= */
   useEffect(() => {
-    Promise.all([
-      api.get("notes/"),
-      api.get("notes/years/"),
-    ])
+    Promise.all([api.get("notes/"), api.get("notes/years/")])
       .then(([notesRes, yearsRes]) => {
         setNotes(notesRes.data || []);
         setYears(yearsRes.data || []);
@@ -57,9 +54,12 @@ export default function Notes() {
 
   /* ================= SEMESTERS ================= */
   useEffect(() => {
+    setSemester("");
+    setSubject("");
+    setSubjects([]);
+
     if (!year) {
       setSemesters([]);
-      setSemester("");
       return;
     }
 
@@ -71,9 +71,10 @@ export default function Notes() {
 
   /* ================= SUBJECTS ================= */
   useEffect(() => {
+    setSubject("");
+
     if (!semester) {
       setSubjects([]);
-      setSubject("");
       return;
     }
 
@@ -83,13 +84,15 @@ export default function Notes() {
       .catch(() => setSubjects([]));
   }, [semester]);
 
-  /* ================= FILTER ================= */
-  const filteredNotes = notes.filter((n) =>
-    n.title.toLowerCase().includes(search.toLowerCase()) &&
-    (!year || n.subject.semester.year.id === Number(year)) &&
-    (!semester || n.subject.semester.id === Number(semester)) &&
-    (!subject || n.subject.id === Number(subject))
-  );
+  /* ================= FILTER (FIXED) ================= */
+  const filteredNotes = notes.filter((n) => {
+    return (
+      n.title?.toLowerCase().includes(search.toLowerCase()) &&
+      (!year || n.subject?.semester?.year?.id === Number(year)) &&
+      (!semester || n.subject?.semester?.id === Number(semester)) &&
+      (!subject || n.subject?.id === Number(subject))
+    );
+  });
 
   const finalNotes = showSaved
     ? filteredNotes.filter((n) => bookmarks.includes(n.id))
@@ -168,7 +171,9 @@ export default function Notes() {
         <select value={year} onChange={(e) => setYear(e.target.value)}>
           <option value="">Select MCA Year</option>
           {years.map((y) => (
-            <option key={y.id} value={y.id}>{y.name}</option>
+            <option key={y.id} value={y.id}>
+              {y.name}
+            </option>
           ))}
         </select>
 
@@ -179,7 +184,9 @@ export default function Notes() {
         >
           <option value="">Select Semester</option>
           {semesters.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
           ))}
         </select>
 
@@ -190,7 +197,9 @@ export default function Notes() {
         >
           <option value="">Select Subject</option>
           {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>{sub.name}</option>
+            <option key={sub.id} value={sub.id}>
+              {sub.name}
+            </option>
           ))}
         </select>
       </div>
@@ -210,10 +219,7 @@ export default function Notes() {
               {note.subject?.name} • {note.subject?.semester?.name}
             </p>
 
-            <div
-              className="pdf-preview"
-              onClick={() => handleView(note)}
-            >
+            <div className="pdf-preview" onClick={() => handleView(note)}>
               📄 PDF • {note.download_count || 0} downloads
             </div>
 
