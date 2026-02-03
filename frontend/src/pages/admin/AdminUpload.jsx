@@ -5,15 +5,6 @@ import "../../styles/adminUpload.css";
 import { uploadPDF } from "../../utils/supabaseUpload";
 
 function AdminUpload() {
-  const token = localStorage.getItem("access");
-  const isAdmin = localStorage.getItem("is_admin") === "true";
-
-  useEffect(() => {
-    if (!token || !isAdmin) {
-      window.location.href = "/login";
-    }
-  }, [token, isAdmin]);
-
   const [years, setYears] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -29,7 +20,9 @@ function AdminUpload() {
 
   /* LOAD YEARS */
   useEffect(() => {
-    api.get("notes/years/").then(res => setYears(res.data));
+    api.get("/notes/years/")
+      .then(res => setYears(res.data))
+      .catch(() => setYears([]));
   }, []);
 
   /* LOAD SEMESTERS */
@@ -38,8 +31,9 @@ function AdminUpload() {
       setSemesters([]);
       return;
     }
-    api.get(`notes/semesters/?year=${selectedYear}`)
-      .then(res => setSemesters(res.data));
+    api.get(`/notes/semesters/?year=${selectedYear}`)
+      .then(res => setSemesters(res.data))
+      .catch(() => setSemesters([]));
   }, [selectedYear]);
 
   /* LOAD SUBJECTS */
@@ -48,50 +42,53 @@ function AdminUpload() {
       setSubjects([]);
       return;
     }
-    api.get(`notes/subjects/?semester=${selectedSemester}`)
-      .then(res => setSubjects(res.data));
+    api.get(`/notes/subjects/?semester=${selectedSemester}`)
+      .then(res => setSubjects(res.data))
+      .catch(() => setSubjects([]));
   }, [selectedSemester]);
 
-const handleUpload = async (e) => {
-  e.preventDefault();
+  /* UPLOAD */
+  const handleUpload = async (e) => {
+    e.preventDefault();
 
-  if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
-    toast.error("All fields required");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const pdfUrl = await uploadPDF(file);
-
-    if (!pdfUrl) {
-      throw new Error("Supabase upload failed");
+    if (!selectedYear || !selectedSemester || !selectedSubject || !title || !file) {
+      toast.error("All fields required");
+      return;
     }
 
-    await api.post("notes/", {
-      title,
-      subject_id: selectedSubject,   // ✅ FIXED
-      pdf_url: pdfUrl,
-    });
+    setLoading(true);
 
-    toast.success("Note uploaded");
+    try {
+      const pdfUrl = await uploadPDF(file);
 
-    setTitle("");
-    setFile(null);
-    setSelectedYear("");
-    setSelectedSemester("");
-    setSelectedSubject("");
-    fileInputRef.current.value = "";
+      if (!pdfUrl) {
+        throw new Error("Supabase upload failed");
+      }
 
-  } catch (err) {
-    console.error(err);
-    toast.error("Upload failed");
-  } finally {
-    setLoading(false);
-  }
-};
+      await api.post("/notes/", {
+        title,
+        subject_id: selectedSubject,
+        pdf_url: pdfUrl,
+      });
 
+      toast.success("Note uploaded");
+
+      setTitle("");
+      setFile(null);
+      setSelectedYear("");
+      setSelectedSemester("");
+      setSelectedSubject("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="upload-page">
@@ -102,7 +99,9 @@ const handleUpload = async (e) => {
         <form onSubmit={handleUpload}>
           <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
             <option value="">Select Year</option>
-            {years.map(y => <option key={y.id} value={y.id}>{y.name}</option>)}
+            {years.map(y => (
+              <option key={y.id} value={y.id}>{y.name}</option>
+            ))}
           </select>
 
           <select
@@ -111,7 +110,9 @@ const handleUpload = async (e) => {
             disabled={!selectedYear}
           >
             <option value="">Select Semester</option>
-            {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            {semesters.map(s => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
           </select>
 
           <select
