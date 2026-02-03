@@ -48,7 +48,8 @@ class NoteSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-    pdf_url = serializers.CharField(read_only=True)
+    # ✅ MUST be writeable
+    pdf_url = serializers.URLField(required=False, allow_null=True)
 
     class Meta:
         model = Note
