@@ -6,13 +6,19 @@ function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  /* ================= AUTH GUARD ================= */
+  const token = localStorage.getItem("access_token");
   const isAdmin = localStorage.getItem("is_admin") === "true";
 
+  // ⛔ Do not render layout after logout
+  if (!token) {
+    return null;
+  }
+
+  /* ================= THEME ================= */
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
-
-  const [savedCount, setSavedCount] = useState(0);
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -22,21 +28,29 @@ function Layout() {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
+  /* ================= SAVED COUNT ================= */
+  const [savedCount, setSavedCount] = useState(0);
+
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("bookmarks")) || [];
-    setSavedCount(saved.length);
+    try {
+      const saved = JSON.parse(localStorage.getItem("bookmarks")) || [];
+      setSavedCount(saved.length);
+    } catch {
+      setSavedCount(0);
+    }
   }, [location.pathname]);
 
+  /* ================= LOGOUT (HARD REDIRECT) ================= */
   const logout = () => {
     localStorage.clear();
-    navigate("/login", { replace: true });
+    window.location.replace("/login"); // ✅ VERY IMPORTANT
   };
 
+  /* ================= HELPERS ================= */
   const isActive = (path) =>
     location.pathname === path ||
     location.pathname.startsWith(path + "/");
 
-  /* 📄 PAGE TITLE (MOBILE) */
   const getTitle = () => {
     if (location.pathname.startsWith("/admin")) return "Admin Dashboard";
     if (location.pathname.startsWith("/dashboard")) return "Dashboard";
@@ -75,14 +89,14 @@ function Layout() {
                 to="/admin"
                 className={isActive("/admin") ? "active" : ""}
               >
-                🛠 Admin Dashboard
+                🛠 Admin
               </Link>
 
               <Link
                 to="/admin/upload"
                 className={isActive("/admin/upload") ? "active" : ""}
               >
-                ⬆ Upload Notes
+                ⬆ Upload
               </Link>
             </>
           )}
@@ -130,6 +144,7 @@ function Layout() {
           </div>
         </header>
 
+        {/* ================= CONTENT ================= */}
         <div className="content">
           <Outlet />
         </div>
