@@ -208,73 +208,51 @@ mca-study-hub/
 │   └── urls.py
 
 
----
-
-## ⚙ Environment Variables
-
-### Frontend (`.env`)
-```env
+⚙ Environment Variables
+Frontend (.env)
 VITE_API_BASE_URL=https://your-backend-url/api
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_key
+
 Backend (.env)
-env
-Copy code
 SECRET_KEY=your_secret_key
 DEBUG=False
 DATABASE_URL=your_database_url
+
 🚀 Installation & Setup
 Frontend
-bash
-Copy code
 npm install
 npm run dev
+
 Backend
-bash
-Copy code
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+
 📈 Future Enhancements
 🔍 Full-text PDF search
-
 📊 Admin analytics dashboard
-
 🧾 PDF preview thumbnails
-
 🔔 Notifications
-
 📱 Progressive Web App (PWA)
 
 🎓 College Project Information
 Project Title: MCA Study Hub
-
 Domain: Full-Stack Web Development
-
 Frontend: React
-
 Backend: Django REST Framework
-
 Database: MySQL
-
 Storage: Supabase
-
 Authentication: JWT
 
 💼 Resume-Ready Description
 MCA Study Hub | Full-Stack Web Application
 
 Developed a role-based academic notes platform using React and Django REST
-
 Implemented secure JWT authentication
-
 Integrated Supabase cloud storage for PDF handling
-
 Designed a responsive UI with dark and light mode
-
 Deployed frontend on Vercel and backend on Render
-<<<<<<< HEAD
-=======
 
 🔗 LinkedIn Project Description
 🚀 MCA Study Hub – Full Stack Project
@@ -282,8 +260,7 @@ Deployed frontend on Vercel and backend on Render
 A secure academic platform for viewing and downloading notes and previous year question papers.
 
 Tech Stack: React, Django REST, MySQL, Supabase, JWT
-🌐 Live Demo: https://mca-study-hub.vercel.app
->>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
+Live Demo: https://mca-study-hub.vercel.app
 
 ⭐ Contributing
 Contributions are welcome!
