@@ -1,26 +1,24 @@
-# 🎓 MCA Study Hub – Notes & Previous Year Papers Platform  
-### 🚀 Full-Stack Web Application | React + Django REST + Supabase
+<p align="center">
+  <img src="assets/banner.png" alt="MCA Study Hub Banner" />
+</p>
+
+# 🎓 MCA Study Hub  
+### 🚀 Notes & Previous Year Papers Platform  
+**Full-Stack Web Application | React • Django REST • Supabase**
 
 <p align="center">
-  <img src="https://dummyimage.com/1200x320/4f46e5/ffffff&text=MCA+Study+Hub" alt="MCA Study Hub Banner" />
+  <b>
+    A modern, secure, and responsive academic platform for MCA students to view,
+    download, and manage study materials with ease.
+  </b>
 </p>
 
 <p align="center">
-  <b>A modern academic platform for MCA students to view, download, and manage notes & previous year question papers.</b>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/github/stars/your-username/mca-study-hub?style=for-the-badge" />
-  <img src="https://img.shields.io/github/forks/your-username/mca-study-hub?style=for-the-badge" />
-  <img src="https://img.shields.io/github/issues/your-username/mca-study-hub?style=for-the-badge" />
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue" />
-  <img src="https://img.shields.io/badge/Backend-Django%20REST-green" />
-  <img src="https://img.shields.io/badge/Auth-JWT-orange" />
-  <img src="https://img.shields.io/badge/Storage-Supabase-black" />
-  <img src="https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-success" />
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Backend-Django%20REST-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Auth-JWT-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Storage-Supabase-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-success?style=for-the-badge" />
 </p>
 
 ---
@@ -34,105 +32,106 @@
 
 ## 📌 About MCA Study Hub
 
-**MCA Study Hub** is a **full-stack academic management system** built for **MCA students** to:
+**MCA Study Hub** is a **full-stack academic management system** designed for **MCA students** to easily access:
 
-- 📘 Access subject-wise notes  
-- 📄 Download previous year question papers (PDF)  
-- ⭐ Save important study materials  
+- 📘 Subject-wise notes  
+- 📄 Previous year question papers (PDF)  
+- ⭐ Saved / bookmarked study materials  
 
-Admins can manage all academic content securely via an admin dashboard.
+Admins can securely manage academic structure and upload PDFs through a dedicated admin dashboard.
 
-This project demonstrates **real-world full-stack development**, **secure authentication**, and **cloud storage integration**.
+This project demonstrates **real-world full-stack development**, **secure authentication**, and **cloud-based file storage**.
 
 ---
 
 ## ✨ Features
 
 ### 👨‍🎓 Student / User Features
-- 🔐 Secure JWT login & logout
-- 📚 Notes organized by **Year → Semester → Subject**
-- 🔍 Real-time search
-- 📄 View PDFs in browser
-- ⬇ Download PDFs
-- ⭐ Bookmark notes
-- 📊 Download count tracking
-- 🌙 Dark / ☀ Light mode
-- 📱 Mobile-first responsive UI
+- 🔐 Secure JWT login & logout  
+- 📚 Notes organized by **Year → Semester → Subject**  
+- 🔍 Real-time search  
+- 📄 View PDFs directly in browser  
+- ⬇ Download PDFs  
+- ⭐ Bookmark important notes  
+- 📊 Automatic download count tracking  
+- 🌙 Dark / ☀ Light mode  
+- 📱 Fully responsive (mobile & desktop)  
 
 ---
 
 ### 👨‍💼 Admin Features
-- 🔐 Admin-only protected routes
-- ➕ Upload PDF notes
-- 🗂 Manage Years, Semesters, Subjects & Notes
-- ✏ Edit / ❌ Delete notes
-- 📊 Auto-increment download counter
-- ☁ Secure PDF storage using Supabase
+- 🔐 Admin-only protected routes  
+- ➕ Upload PDF notes  
+- 🗂 Manage:
+  - MCA Years  
+  - Semesters  
+  - Subjects  
+  - Notes  
+- ✏ Edit / ❌ Delete notes  
+- 📊 Auto-increment download counter  
+- ☁ Secure PDF storage using **Supabase**
 
 ---
 
 ## 🖼 Screenshots
 
-> Replace with your actual screenshots for maximum GitHub impact
+> 📸 Replace these with your real screenshots (recommended)
 
-```md
+### 🔐 Authentication
 ![Login](screenshots/login.png)
+
+### 📘 Notes Page
 ![Notes](screenshots/notes.png)
+
+### 🛠 Admin Dashboard
 ![Admin Dashboard](screenshots/admin-dashboard.png)
+
+### ⬆ Upload Notes
 ![Upload Notes](screenshots/upload-notes.png)
-🧱 Tech Stack
-🎨 Frontend
-React (Vite)
 
-React Router DOM
+---
 
-Axios
+## 🧱 Tech Stack
 
-Custom CSS
+### 🎨 Frontend
+- React (Vite)
+- React Router DOM
+- Axios
+- Custom CSS
+- Dark / Light Theme
+- Responsive UI
 
-Dark / Light Mode
+### 🧠 Backend
+- Django
+- Django REST Framework
+- JWT Authentication
+- MySQL (Aiven)
+- Role-based permissions
 
-Responsive Design
+### ☁ Storage
+- Supabase Storage
+- Public PDF URLs
+- Secure uploads
 
-🧠 Backend
-Django
+### 🚀 Deployment
+- Frontend → **Vercel**
+- Backend → **Render**
 
-Django REST Framework
+---
 
-JWT Authentication
+## 🔐 Security & Authentication
 
-MySQL (Aiven)
+- JWT Access & Refresh Tokens  
+- Protected Routes  
+- Admin-only APIs  
+- Secure Logout (no redirect loops)  
+- CORS enabled  
 
-Role-based permissions
+---
 
-☁ Storage
-Supabase Storage
+## 📂 Project Structure
 
-Public PDF URLs
-
-Secure uploads
-
-🚀 Deployment
-Frontend → Vercel
-
-Backend → Render
-
-🔐 Security & Authentication
-JWT Access & Refresh tokens
-
-Protected routes
-
-Admin-only APIs
-
-Secure logout
-
-CORS enabled
-
-No redirect loops
-
-📂 Project Structure
-text
-Copy code
+```text
 mca-study-hub/
 ├── frontend/
 │   ├── pages/
@@ -148,13 +147,13 @@ mca-study-hub/
 │   ├── settings.py
 │   └── urls.py
 ⚙ Environment Variables
-Frontend
+Frontend (.env)
 env
 Copy code
 VITE_API_BASE_URL=https://your-backend-url/api
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_key
-Backend
+Backend (.env)
 env
 Copy code
 SECRET_KEY=your_secret_key
@@ -199,11 +198,11 @@ Storage: Supabase
 Authentication: JWT
 
 💼 Resume-Ready Description
-MCA Study Hub – Full-Stack Web Application
+MCA Study Hub | Full-Stack Web Application
 
 Developed a role-based academic notes platform using React & Django REST
 
-Implemented JWT authentication with protected routes
+Implemented secure JWT authentication
 
 Integrated Supabase cloud storage for PDF handling
 
