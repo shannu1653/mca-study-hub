@@ -99,19 +99,28 @@ This project demonstrates **real-world full-stack development**,
 
 ## 🖼 Screenshots
 
-> Replace these with real screenshots later
+> Real application screenshots (scaled for better readability)
 
 ### 🔐 Login Page
-![Login Page](screenshots/login.png)
+<p align="center">
+  <img src="screenshots/login.png" width="350" alt="Login Page" />
+</p>
 
 ### 📘 Notes Page
-![Notes Page](screenshots/notes.png)
+<p align="center">
+  <img src="screenshots/notes.png" width="350" alt="Notes Page" />
+</p>
 
 ### 🛠 Admin Dashboard
-![Admin Dashboard](screenshots/admin-dashboard.png)
+<p align="center">
+  <img src="screenshots/admin-dashboard.png" width="350" alt="Admin Dashboard" />
+</p>
 
 ### ⬆ Upload Notes
-![Upload Notes](screenshots/upload-notes.png)
+<p align="center">
+  <img src="screenshots/upload-notes.png" width="350" alt="Upload Notes Page" />
+</p>
+
 
 ---
 
