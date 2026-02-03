@@ -171,22 +171,32 @@ mca-study-hub/
 │   └── urls.py
 
 
+<<<<<<< HEAD
 ---
 
 ## ⚙ Environment  Variables 
 
 ### Frontend (`.env`)
+=======
+⚙ Environment Variables
+Frontend (.env)
+>>>>>>> 166ebe364cff3c6d74cc79ab6d789cf9a3318472
 VITE_API_BASE_URL=https://your-backend-url/api
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_key
 
+<<<<<<< HEAD
 
 ## Backend (.env)
 
+=======
+Backend (.env)
+>>>>>>> 166ebe364cff3c6d74cc79ab6d789cf9a3318472
 SECRET_KEY=your_secret_key
 DEBUG=False
 DATABASE_URL=your_database_url
 
+<<<<<<< HEAD
 
 
 ## Installation & Setup Frontend
@@ -195,12 +205,24 @@ npm install
 npm run dev
 
 ## Backend
+=======
+🚀 Installation & Setup
+Frontend
+npm install
+npm run dev
+
+Backend
+>>>>>>> 166ebe364cff3c6d74cc79ab6d789cf9a3318472
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 
+<<<<<<< HEAD
 
 ## 📈 Future Enhancements
+=======
+📈 Future Enhancements
+>>>>>>> 166ebe364cff3c6d74cc79ab6d789cf9a3318472
 🔍 Full-text PDF search
 📊 Admin analytics dashboard
 🧾 PDF preview thumbnails
@@ -227,7 +249,16 @@ Designed a responsive UI with dark and light mode
 Deployed frontend on Vercel and backend on Render
 
 
+<<<<<<< HEAD
 ## ⭐ Contributing
+=======
+A secure academic platform for viewing and downloading notes and previous year question papers.
+
+Tech Stack: React, Django REST, MySQL, Supabase, JWT
+Live Demo: https://mca-study-hub.vercel.app
+
+⭐ Contributing
+>>>>>>> 166ebe364cff3c6d74cc79ab6d789cf9a3318472
 Contributions are welcome!
 Feel free to fork the repository, open issues, or submit pull requests.
 
