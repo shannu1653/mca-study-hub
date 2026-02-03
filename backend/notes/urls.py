@@ -7,7 +7,7 @@ from .views import (
     SemesterListCreateView,
     SemesterDeleteView,
     SubjectListCreateView,
-    SubjectDeleteView,
+    SubjectDeleteView,increment_download
 )
 
 urlpatterns = [
@@ -26,4 +26,5 @@ urlpatterns = [
     # SUBJECTS
     path("subjects/", SubjectListCreateView.as_view()),
     path("subjects/<int:pk>/", SubjectDeleteView.as_view()),
+    path("<int:pk>/download/", increment_download), 
 ]

@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (
     ListCreateAPIView,
     DestroyAPIView,
@@ -7,6 +8,7 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 from .models import Note, Year, Semester, Subject
 from .serializers import (
@@ -74,6 +76,24 @@ class NoteDetailView(RetrieveUpdateDestroyAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super().delete(request, *args, **kwargs)
+
+
+# =====================================================
+# NOTE DOWNLOAD COUNT (INCREMENT)
+# =====================================================
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def increment_download(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+
+    note.download_count += 1
+    note.save(update_fields=["download_count"])
+
+    return Response(
+        {"download_count": note.download_count},
+        status=status.HTTP_200_OK
+    )
 
 
 # =====================================================

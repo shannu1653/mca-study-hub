@@ -122,13 +122,32 @@ export default function Notes() {
   };
 
   /* ================= OPEN PDF ================= */
-  const openPdf = (note) => {
-    if (!note.pdf_url) {
-      alert("PDF not available");
-      return;
-    }
+  const openPdf = async (note) => {
+  if (!note.pdf_url) {
+    alert("PDF not available");
+    return;
+  }
+
+  try {
+    // ✅ increment count
+    await api.post(`/notes/${note.id}/download/`);
+
+    // ✅ open pdf
     window.open(note.pdf_url, "_blank", "noopener");
-  };
+
+    // ✅ update UI count instantly (no reload)
+    setNotes((prev) =>
+      prev.map((n) =>
+        n.id === note.id
+          ? { ...n, download_count: (n.download_count || 0) + 1 }
+          : n
+      )
+    );
+  } catch (err) {
+    console.error("Download count failed", err);
+    window.open(note.pdf_url, "_blank");
+  }
+};
 
   /* ================= INFINITE SCROLL ================= */
   const handleScroll = useCallback(() => {
