@@ -8,8 +8,13 @@
 
 <p align="center">
   <b>
+<<<<<<< HEAD
     A modern, secure, and responsive academic platform for MCA students  
     to view, download, and manage study materials with ease.
+=======
+    MCA Study Hub is a modern, secure, and responsive academic platform  
+    for MCA students to access notes and previous year question papers easily.
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
   </b>
 </p>
 
@@ -53,6 +58,7 @@
 
 **MCA Study Hub** is a **full-stack academic management system** built for **MCA students**.
 
+<<<<<<< HEAD
 Students can:
 - 📘 Access subject-wise notes
 - 📄 Download previous year question papers
@@ -64,20 +70,40 @@ Admins can:
 
 This project demonstrates **real-world full-stack development**,  
 **secure authentication**, and **cloud-based file storage**.
+=======
+It allows students to:
+- View subject-wise notes  
+- Download previous year question papers  
+- Save important study materials  
+
+Admins can:
+- Manage academic structure  
+- Upload and control PDF notes securely  
+
+This project shows **real-world full-stack development**, **secure authentication**, and **cloud storage integration**.
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
 
 ---
 
 ## ✨ Features
 
 ### 👨‍🎓 Student Features
+<<<<<<< HEAD
 - 🔐 Secure JWT login & logout
+=======
+- 🔐 Secure login & logout (JWT)
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
 - 📚 Notes organized by **Year → Semester → Subject**
 - 🔍 Real-time search
 - 📄 View PDFs in browser
 - ⬇ Download PDFs
 - ⭐ Bookmark notes
 - 📊 Download count tracking
+<<<<<<< HEAD
 - 🌙 Dark / ☀ Light mode
+=======
+- 🌙 Dark mode / ☀ Light mode
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
 - 📱 Fully responsive design
 
 ---
@@ -97,8 +123,9 @@ This project demonstrates **real-world full-stack development**,
 
 ---
 
-## 🖼 Screenshots
+## 🖼 Screenshots (Demo Images)
 
+<<<<<<< HEAD
 > Replace these images with real screenshots later
 
 ### 🔐 Login Page
@@ -106,12 +133,21 @@ This project demonstrates **real-world full-stack development**,
 
 ### 📘 Notes Page
 ![Notes Page](screenshots/notes.png)
+=======
+> ⚠ Replace these with real screenshots later
+
+### 🔐 Login Page
+![Login](https://via.placeholder.com/1200x700?text=Login+Page)
+
+### 📘 Notes Page
+![Notes](https://via.placeholder.com/1200x700?text=Notes+Page)
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
 
 ### 🛠 Admin Dashboard
-![Admin Dashboard](screenshots/admin-dashboard.png)
+![Admin Dashboard](https://via.placeholder.com/1200x700?text=Admin+Dashboard)
 
-### ⬆ Upload Notes
-![Upload Notes](screenshots/upload-notes.png)
+### ⬆ Upload Notes Page
+![Upload Notes](https://via.placeholder.com/1200x700?text=Upload+Notes)
 
 ---
 
@@ -237,6 +273,17 @@ Integrated Supabase cloud storage for PDF handling
 Designed a responsive UI with dark and light mode
 
 Deployed frontend on Vercel and backend on Render
+<<<<<<< HEAD
+=======
+
+🔗 LinkedIn Project Description
+🚀 MCA Study Hub – Full Stack Project
+
+A secure academic platform for viewing and downloading notes and previous year question papers.
+
+Tech Stack: React, Django REST, MySQL, Supabase, JWT
+🌐 Live Demo: https://mca-study-hub.vercel.app
+>>>>>>> 5fb275d7753123d903fa5473e28b57334ff3e256
 
 ⭐ Contributing
 Contributions are welcome!
